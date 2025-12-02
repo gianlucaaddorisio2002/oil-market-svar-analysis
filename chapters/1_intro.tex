@@ -1,0 +1,265 @@
+\chapter{Introduction}
+
+\section{Motivation and Background}
+
+    Understanding the behaviour of crude oil prices is critical for macroeconomic
+    analysis, financial stability and industrial decision-making. Oil remains the world's most
+    strategic commodity, influencing inflation, business cycles, transportation networks and
+    geopolitical dynamics. Because crude oil serves both as a physical input and as a financial asset,
+    its price reflects a complex interaction between real fundamentals, expectations, inventories,
+    speculative pressures and policy events. As argued by \textcite{BarskyKilian2002, BarskyKilian2004},
+    macroeconomic outcomes associated with oil price movements cannot be understood through
+    a simplistic focus on physical supply disruptions alone.
+
+    A central insight of the modern literature is that oil price fluctuations predominantly reflect
+    global aggregate demand conditions and changes in precautionary inventories rather than
+    supply-side disturbances. In the structural decomposition of \textcite{Kilian2009}, shocks to global
+    real economic activity account for the majority of medium-run oil price variation, while
+    precautionary demand shocks --- captured through inventory dynamics --- generate sharp price
+    spikes during episodes of uncertainty about future availability. More recent contributions
+    \parencite{KilianMurphy2014, BaumeisterHamilton2019} confirm these findings and refine the
+    understanding of speculative motives and inventory behaviour.
+
+    Despite substantial progress in modelling, a persistent misconception in public and policy discussions is that oil price spikes are mainly supply-driven. Structural evidence, however, contradicts this view: most large post-1990 price surges were demand-led rather than the result of physical shortages \cite{KilianZhou2020}. Historical accounts further reinforce this interpretation, showing that many so-called “supply crises” were in fact driven by shifts in global demand, precautionary behaviour, or broader macroeconomic conditions \cite{Carollo2010}.
+     However, the
+    empirical evidence overwhelmingly shows that supply shocks are relatively rare, generally small
+    in magnitude and have limited persistence. The short-run price elasticity of crude oil supply is
+    extremely low, reflecting physical and technological constraints in the extraction sector.
+    Consequently, even small shifts in global economic activity or revisions in expectations can
+    produce outsized price movements.
+
+    The complexity of the oil market extends beyond macroeconomic theory. For industries
+    that rely heavily on refined petroleum products --- particularly aviation --- fluctuations in oil and
+    jet fuel prices translate into substantial financial risk. Fuel expenses typically represent between
+    20\% and 35\% of airline operating costs \parencite{IATA_FuelCosts2024}. This exposure
+    makes airlines highly vulnerable to extreme price movements arising from macroeconomic or
+    geopolitical shocks. For this reason, the aviation sector requires robust risk management tools
+    capable of mapping crude oil disturbances into jet fuel prices and quantifying the impact on
+    cash-flow and budgeting decisions. 
+    \newline
+    
+    Modern risk management increasingly relies on scenario-based methods that integrate
+    economic fundamentals. Firms can no longer depend on simple forecasting tools or static
+    projections, as such models fail to capture the structural origins of volatility. Instead, firms look
+    towards econometric frameworks capable of isolating the underlying drivers of price
+    movements and generating both probabilistic scenarios and adversarial stress tests
+    \parencite{AndersonKelloggSalant2018, SockinXiong2015}. Structural VAR (SVAR) models, in particular, offer
+    a theoretically grounded method for disentangling supply, demand and inventory shocks, while
+    copula-based approaches allow researchers to characterise nonlinear dependence and
+    tail-risk interactions across shocks. 
+\\
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.99\textwidth]{fig_stylised_oil_market.png}
+    \caption{Stylised Facts of the Oil Market, 1990--2024: Real WTI Price, OECD Activity, Oil Production, Oil Inventories. (\textit{Source}: own elaboration on EIA, FRED and OECD data)}
+    \label{fig:stylisedfacts}
+\end{figure}
+
+Figure~\ref{fig:stylisedfacts} presents a visual overview of the main variables used throughout
+the thesis. The co-movement between global activity and crude oil prices is striking, especially
+during episodes such as the 2003--2008 expansion and the COVID-19 contraction. Production
+adjusts slowly, while inventories exhibit spikes during periods of heightened uncertainty. These
+stylised facts motivate the adoption of a multivariate dynamic model capable of accounting
+for these interactions.
+
+\section{Problem Statement}
+
+Despite extensive research, economists and practitioners face several persistent challenges in
+modelling and interpreting oil price dynamics.
+
+First, the oil market is inherently multivariate. Real oil prices respond to production, global
+business cycles, inventory adjustments and financial market conditions. Univariate models, including autoregressive specifications and static regressions, cannot reproduce these joint dynamics. Formal diagnostic tests confirm the inadequacy of such models: regressions of the
+real price of oil on production, activity and inventories exhibit strong serial correlation in the
+residuals \parencite{LjungBox1978}, heteroscedasticity \parencite{BreuschPagan1979} and clear departures from
+normality \parencite{JarqueBera1987, Massey1951}. Coefficient instability across subsamples further
+suggests that relationships are time-varying and regime-dependent \parencite{Brown1975, BaiPerron2003}.
+
+Second, reduced-form VARs, while effective in capturing dynamic interactions, do not provide economically meaningful interpretations of shocks unless a structural identification strategy is imposed. As emphasised by \textcite{Sims1980} and formalised in the oil-market context by \textcite{Kilian2009}, theory-based restrictions are essential for distinguishing supply, aggregate-demand and precautionary-demand innovations. Building on these principles, \textcite{RubioRamirez2010} show how identification schemes can be derived in a fully Bayesian framework. Without economically motivated restrictions, impulse responses cannot be interpreted in terms of underlying structural mechanisms.
+
+
+Third, extreme events play a central role in the oil market. Structural shocks display
+heavy-tailed distributions, meaning that rare but impactful events occur with higher probability
+than implied by Gaussian models. Modelling these extremes requires flexible distributional
+assumptions and tools capable of capturing tail dependence, such as copulas \parencite{Nelsen2006,
+Patton2012}.
+
+Finally, translating structural oil shocks into industrial risk metrics requires bridging two
+domains: macroeconometric modelling and corporate finance. Firms need tools that not only
+identify the origins of price movements, but also translate them into actionable scenarios,
+stress tests and hedging implications. This is particularly relevant for airlines, where fuel-price
+risk affects fleet planning, pricing strategies and financial performance.
+
+\section{Theoretical Framework}
+
+The theoretical backbone of this thesis is the structural VAR framework originally proposed by
+\textcite{Kilian2009} and later refined by \textcite{KilianMurphy2014}. In this framework, the global oil market
+is driven by three fundamental shocks:
+
+\begin{enumerate}
+    \item \textbf{Flow supply shocks} --- unexpected changes in global crude oil production.
+    \item \textbf{Aggregate demand shocks} --- shifts in global real economic activity, reflecting industrial
+    demand for commodities.
+    \item \textbf{Precautionary or inventory demand shocks} --- changes in expectations about future oil
+    availability, inferred through adjustments in inventories.
+\end{enumerate}
+
+Flow supply shocks typically have limited and short-lived effects on oil prices due to the
+inelasticity of near-term production. By contrast, aggregate demand shocks produce large and
+persistent price movements, reflecting the procyclical nature of industrial commodity markets.
+Precautionary demand shocks capture periods of heightened uncertainty, during which firms and
+speculators increase inventory holdings in anticipation of potential future shortages
+\cite{Kilian2009,BaumeisterHamilton2019}.
+
+
+\begin{figure}[t!]
+\centering
+\begin{tikzpicture}[
+    >=Latex,
+    box/.style={
+        rectangle,
+        draw,
+        rounded corners,
+        minimum height=1.1cm,
+        minimum width=4.8cm,
+        align=center,
+        thick,
+        fill=gray!5
+    },
+    arrow/.style={->, very thick}
+]
+
+% Colonna shock a sinistra
+\node[box] (supply)    at (0, 2.0) {Flow Supply Shock};
+\node[box] (demand)    at (0, 0.0) {Aggregate Demand Shock};
+\node[box] (inventory) at (0,-2.0) {Precautionary Shock};
+
+% VAR al centro
+\node[box, minimum width=5.0cm] (var) at (6,0) {Structural VAR System};
+
+% Prezzo a destra
+\node[box, minimum width=4.8cm] (price) at (11,0) {Real Price of Oil};
+
+% Frecce shock -> VAR
+\draw[arrow] (supply.east)    to[bend left=15]  (var.north west);
+\draw[arrow] (demand.east)    --                (var.west);
+\draw[arrow] (inventory.east) to[bend right=15] (var.south west);
+
+% Freccia VAR -> prezzo
+\draw[arrow] (var.east) -- (price.west);
+
+\end{tikzpicture}
+\caption{Conceptual structure of the oil market SVAR model.}
+\label{fig:varconcept}
+\end{figure}
+
+
+
+
+Figure~\ref{fig:varconcept} provides a schematic representation of the structural model. Each
+shock affects oil prices through distinct channels, though real-world dynamics often involve
+interactions between shocks. The structural VAR allows researchers to quantify these effects
+through impulse response functions (IRFs) and forecast error variance decompositions (FEVD).
+
+Beyond the VAR, this thesis incorporates distributional analysis of structural shocks, building
+on the observation that heavy tails and nonlinear dependence are key features of global
+commodity markets. Understanding tail dependencies is crucial for designing robust stress
+tests and risk scenarios.
+
+\section{Research Objectives}
+
+This thesis pursues four overarching objectives:
+
+\begin{enumerate}
+    \item \textbf{To construct a harmonised and comprehensive monthly dataset (1990--2024)} including
+    real crude oil prices, global crude oil production, OECD industrial activity and U.S. petroleum
+    and product inventories, using official sources such as the EIA and the Federal Reserve
+    \parencite{WTI_FRED, Inventories_EIA, OilProduction_EIA}.
+    
+    \item \textbf{To estimate and validate a reduced-form VAR model} that captures the dynamic
+    interactions between these variables, supported by extensive diagnostic testing
+    \parencite{Lutkepohl2005}.
+    
+    \item \textbf{To identify structural shocks using sign restrictions and elasticity bounds}, following the
+    methodology of \textcite{KilianMurphy2014}, and to characterise their impulse responses and
+    variance contributions.
+    
+    \item \textbf{To translate structural oil shocks into industrial risk metrics}, including Monte Carlo
+    scenario generation, Hormuz-type stress testing and hedging implications for a commercial
+    airline exposed to jet fuel price fluctuations.
+\end{enumerate}
+
+\section{Methodological Contribution}
+
+This thesis makes several methodological contributions to the empirical analysis of oil markets
+and their industrial applications:
+
+\begin{itemize}
+    \item \textbf{Data construction and proxy evaluation.}  
+    It provides a harmonised dataset covering more than three decades of global oil market
+    activity. A key contribution is the evaluation of alternative proxies for global real activity,
+    comparing OECD-based indicators to the \textit{REA} index \parencite{IGREA_DallasFed, Kilian2019}.
+    
+    \item \textbf{Structural identification.}  
+    The thesis implements a robust identification strategy based on sign and elasticity
+    restrictions, ensuring economically meaningful structural shocks consistent with the oil
+    market literature \parencite{KilianMurphy2014, BaumeisterHamilton2019}.
+    
+    \item \textbf{Distributional characterisation of shocks.}  
+    It documents heavy-tailed marginal distributions and copula-based dependence structures
+    across structural shocks, revealing substantial tail dependence between demand and
+    precautionary disturbances \parencite{Nelsen2006, Patton2012}.
+    
+    \item \textbf{Stress-testing framework.}  
+    The thesis develops a scenario generation and stress-testing framework grounded in
+    structural econometrics and applicable to industrial decision-making, particularly the
+    aviation sector.
+    
+    \item \textbf{Application to fuel risk management.}  
+    The thesis bridges macroeconomic modelling with corporate risk management by mapping
+    structural oil shocks into jet fuel price paths and assessing the impact on an airline's fuel
+    cost exposure.
+\end{itemize}
+
+\begin{table}[t!]
+\centering
+\caption{Key structural mechanisms in oil markets.}
+\label{tab:mechanisms}
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{p{3.2cm}p{7.2cm}p{3.4cm}}
+\toprule
+\textbf{Mechanism} & \textbf{Description} & \textbf{References} \\
+\midrule
+Flow supply        & Slow adjustment due to extraction and investment constraints & Kilian \& Murphy (2014) \\
+Aggregate demand   & Driven by the global business cycle and industrial activity & Barsky \& Kilian (2002, 2004) \\
+Inventory demand   & Reflects expectations about future availability             & Alquist, Bhattarai \& Coibion (2019) \\
+Speculation        & Amplifies short-run volatility                              & Sockin \& Xiong (2015) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{Structure of the Thesis}
+
+The thesis is organised into five chapters:
+
+\begin{itemize}
+    \item \textbf{Chapter 2} introduces the dataset, details preprocessing steps and presents the
+    econometric methodology, including stationarity analysis and the specification of the
+    reduced-form VAR model.
+    
+    \item \textbf{Chapter 3} presents the estimation results of the VAR model and the identification of
+    structural shocks. It reports impulse responses, variance decompositions and the
+    transmission of shocks to oil prices.
+    
+    \item \textbf{Chapter 4} examines the empirical distributions of structural shocks, estimates copula
+    models to capture nonlinear dependence and applies the structural results to scenario
+    generation, stress testing and hedging.
+    
+    \item \textbf{Chapter 5} concludes by summarising the main findings, discussing limitations and
+    proposing avenues for future research.
+\end{itemize}
+
+These considerations motivate the multivariate modelling framework employed in the remainder of this thesis.
+
+

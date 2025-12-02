@@ -1,0 +1,331 @@
+\chapter{Empirical Analysis of Oil Market Dynamics}
+\label{ch:empirical}
+
+\section{Overview}
+
+This chapter presents the empirical analysis of the oil market based on the multivariate dynamic framework developed in Chapter~\ref{ch:data-methods}. Building on the harmonised monthly dataset and the VAR(12) specification constructed through \texttt{build\_oil\_dataset.m} and \texttt{var\_main.m}, the objective is to identify and quantify the structural disturbances driving the real price of oil.
+
+The analysis follows the structural VAR (SVAR) approach of \textcite{Kilian2009} and \textcite{KilianMurphy2014}, using sign and elasticity restrictions to identify three economically meaningful shocks: a flow supply shock, an aggregate demand shock, and a precautionary demand shock. Impulse responses, forecast error variance decompositions (FEVDs) and historical decompositions are used to characterise the transmission of these shocks. The final section maps structural shocks into WTI price trajectories, laying the groundwork for the scenario-based stress tests in Chapter~\ref{ch:stress}.
+
+In addition to the VAR/SVAR analysis reported in this chapter, Appendix~B
+provides an exploratory study of the marginal distributions and copula-based
+dependence structure of the identified structural shocks.
+
+\section{Reduced-Form VAR Results}
+\label{sec:var-results}
+
+\subsection{Estimation and Diagnostics}
+
+The reduced-form VAR(12) is estimated on the stationary vector
+\[
+x_t =
+\begin{bmatrix}
+\Delta \log \text{Prod}_t \\
+\text{OECD\_cycle}_t \\
+\Delta \log \text{WTI}_t \\
+\Delta \log \text{Inv}_t
+\end{bmatrix},
+\]
+whose components correspond to the standardised transformations
+\texttt{Production\_DL}, \texttt{OECD\_cycle}, \texttt{WTI\_real\_DL} and
+\texttt{Inventories\_DL} in \texttt{All\_d}.
+
+Residual diagnostics for the VAR(12) indicate (Table~\ref{tab:lag_selection},
+Table~\ref{tab:var-fit}, Figure~\ref{fig:var-stability} and
+Appendix~B}):
+
+\begin{itemize}
+    \item no significant residual autocorrelation, as Ljung--Box
+    portmanteau $p$-values are well above conventional thresholds;
+    \item all companion-matrix eigenvalues strictly inside the unit circle,
+    confirming dynamic stability;
+    \item mild departures from normality (Jarque--Bera tests) and evidence
+    of heavy tails in the residual distribution of the WTI equation;
+    \item overall, sufficient goodness-of-fit and stability for subsequent
+    structural identification.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Reduced-form VAR(12) equation fit statistics.}
+\label{tab:var-fit}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Equation} & \textbf{Number of Parameters} & \textbf{Std.\ Error} & $\mathbf{R^2}$ & \textbf{Adj.\ $R^2$} \\
+\midrule
+Production\_DL  & 49 & 0.9358 & 0.2507 & 0.1468 \\
+OCSE\_DL        & 49 & 0.7255 & 0.5493 & 0.4868 \\
+WTI\_real\_DL   & 49 & 0.9620 & 0.1928 & 0.0808 \\
+Inventories\_DL & 49 & 0.8205 & 0.3978 & 0.3143 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig_var_stability.pdf}
+    \caption{Companion matrix eigenvalues for the VAR(12). All lie inside the unit circle.}
+    \label{fig:var-stability}
+\end{figure}
+
+To quantify the in-sample forecasting performance of the reduced-form model,
+Table~\ref{tab:varfit} reports standard accuracy metrics for real WTI, based
+on the script \texttt{var\_fit\_vs\_actual\_WTI.m}.
+
+\begin{table}[H]
+    \centering
+    \caption{Accuracy metrics for VAR predicted vs.\ actual real WTI.}
+    \label{tab:varfit}
+    \begin{tabular}{lc}
+        \toprule
+        Metric & Value \\
+        \midrule
+        RMSE   & 12.28 \\
+        MAE    & 10.66 \\
+        MAPE   & 61.34\% \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+
+\section{Structural Identification via Sign Restrictions}
+\label{sec:svar-ident}
+
+\subsection{Economic Restrictions}
+
+Following \textcite{Kilian2009} and \textcite{KilianMurphy2014}, sign restrictions are imposed over horizons $h=0,1,2$:
+
+\begin{itemize}
+    \item \textbf{Flow supply shock:} production $\downarrow$, inventories $\downarrow$, real WTI $\uparrow$, OECD -- limited reaction.
+    \item \textbf{Aggregate demand shock:} OECD $\uparrow$, production $\uparrow$, real WTI $\uparrow$, inventories $\uparrow$.
+    \item \textbf{Precautionary demand shock:} inventories $\uparrow$, real WTI $\uparrow$, OECD $\approx$ unchanged.
+\end{itemize}
+
+Table~\ref{tab:sign-restrictions} summarises the full set of restrictions used in the baseline specification.
+\begin{table}[H]
+\centering
+\caption{Sign restrictions used for structural identification (responses on impact).}
+\label{tab:sign-restrictions}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Variable} & \textbf{Supply Shock} & \textbf{Aggregate Demand Shock} & \textbf{Precautionary Shock} \\
+\midrule
+Production   & $-$ & $+$ & $0$ \\
+OECD\_cycle  & $0$ & $+$ & $0$ \\
+Inventories  & $-$ & $+$ & $+$ \\
+Real WTI     & $+$ & $+$ & $+$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+\subsection{Elasticity Bounds}
+
+Elasticity constraints follow \textcite{KilianMurphy2014}:
+
+\[
+\varepsilon^s_p \in [-0.05, 0], \qquad \varepsilon^d_p \in [-0.2, -0.01].
+\]
+
+These enforce plausible short-run responses of supply and demand to price movements.
+
+\subsection{Implementation}
+
+The routine \texttt{svar\_sign\_restrictions.m} implements the
+rotation-based procedure of Rubio-Ramirez, Waggoner and Zha~\cite{RubioRamirez2010}.
+Starting from the reduced-form covariance matrix $\Sigma_u$, the algorithm
+computes its Cholesky factor $P$, draws random orthonormal matrices $Q$ from
+the Haar distribution, and constructs candidate impact matrices $B = P Q$.
+A draw is retained only if the corresponding impulse responses satisfy all
+sign restrictions over the horizon $h = 0,\dots,H$; otherwise it is discarded.
+In the baseline specification, accepted draws represent about 1--3\% of all
+candidates, in line with Kilian and Murphy~\cite{KilianMurphy2014}.
+
+
+\section{Impulse Response Functions}
+\label{sec:irfs}
+
+Because the VAR is estimated on stationary log-differences (and on the
+detrended OECD activity index), the raw impulse responses describe the effect
+of each structural shock on monthly growth rates. For economic interpretation,
+impulse responses for the levels are obtained by cumulating the responses of
+log-differences over the horizon. The figures reported in this section refer to
+these cumulated responses and can therefore be read as percentage deviations of
+the levels from their baseline paths.
+
+Impulse responses (IRFs) are computed over a 36-month horizon using bootstrap
+percentile bands. For each shock, we report the median and the 16th--84th
+percentiles across accepted structural decompositions.
+
+Table~\ref{tab:shock-stats} summarises the basic distributional properties of
+the identified shocks, confirming that they are approximately mean-zero and
+exhibit non-Gaussian higher moments.
+
+\begin{table}[H]
+\centering
+\caption{Descriptive statistics of identified structural shocks.}
+\label{tab:shock-stats}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Shock} & \textbf{Mean} & \textbf{Std.\ Dev.} & \textbf{Skewness} & \textbf{Kurtosis} \\
+\midrule
+Supply           & 0.0000 & 1.0013 & 0.0973   & 3.6076  \\
+Aggregate Demand & 0.0000 & 1.0013 & $-0.5293$ & 4.7428 \\
+Precautionary    & 0.0000 & 1.0013 & 1.7476   & 16.5490 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Flow Supply Shock}
+
+A negative flow supply shock --- interpreted as an unanticipated shortfall in
+U.S.\ crude oil production --- generates the following pattern in the cumulated
+responses:
+
+\begin{itemize}
+    \item an immediate rise in the real WTI price, peaking after roughly
+          3--4 months before gradually declining;
+    \item a decline in crude oil production on impact, with only partial
+          recovery over the subsequent year;
+    \item an inventory drawdown consistent with the use of stocks to smooth
+          the temporary supply shortfall;
+    \item a muted and statistically imprecise reaction in OECD activity.
+\end{itemize}
+
+This configuration is qualitatively consistent with the supply-driven oil price
+episodes documented by \textcite{Kilian2009}.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{fig_irf_supply.png}
+    \caption{Impulse responses to a flow supply shock.}
+    \label{fig:irf-supply}
+\end{figure}
+\subsection{Aggregate Demand Shock}
+
+An aggregate demand expansion, capturing shifts in global economic activity,
+produces:
+
+\begin{itemize}
+    \item a strong and persistent rise in OECD activity;
+    \item an increase in crude oil production and inventories, reflecting the
+          response of supply and stock-building to stronger demand;
+    \item a sustained increase in the real WTI price that remains positive for
+          roughly 12--18 months.
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figu.png}
+    \caption{Impulse responses to an aggregate demand shock.}
+    \label{fig:irf-demand}
+\end{figure}
+
+\subsection{Precautionary Demand Shock}
+
+A precautionary demand shock --- interpreted as a revision in expectations of
+future scarcity --- yields:
+
+\begin{itemize}
+    \item an immediate and sizeable increase in inventories, as market
+          participants build precautionary stocks;
+    \item a short-lived but sharp increase in the real WTI price, which peaks
+          within a few months and then dissipates;
+    \item negligible and statistically weak effects on OECD activity and crude
+          oil production.
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{figuta36.png}
+    \caption{Impulse responses to a precautionary demand shock.}
+    \label{fig:irf-inventory}
+\end{figure}
+
+
+\section{Forecast Error Variance Decomposition}
+\label{sec:fevd}
+
+The FEVD quantifies the importance of each shock in explaining forecast error variance at different horizons. Results are consistent with \textcite{Kilian2009,BaumeisterHamilton2019}:
+
+\begin{itemize}
+    \item supply shocks: limited contribution at short horizons;
+    \item aggregate demand shocks: dominant at 6--18 months;
+    \item precautionary shocks: relevant for short-run volatility.
+\end{itemize}
+
+\subsection{Multipanel FEVD Overview}
+
+To provide a compact view of the contribution of each structural shock to the
+variability of the real WTI price, Figure~\ref{fig:fevd-svar} reports the
+SVAR-based forecast error variance decomposition over horizons up to 24 months.
+Aggregate demand shocks account for roughly 45--50\% of the forecast error
+variance at horizons between 6 and 18 months, while flow supply and
+precautionary shocks each explain about 10\% in the long run.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{svar_wti.png}
+    \caption{SVAR-based forecast error variance decomposition of the real WTI
+    price by structural shock (flow supply, aggregate demand, precautionary).}
+    \label{fig:fevd-svar}
+\end{figure}
+
+The identification scheme and the main properties of the structural shocks are
+summarised in Appendix~B.
+
+
+\section{Historical Decomposition}
+\label{sec:hist-decomp}
+
+Historical decomposition assigns each observed movement in real WTI to one of the structural shocks. Using \texttt{extract\_structural\_shocks.m}, contributions are reconstructed across the full sample.
+
+The decomposition indicates:
+
+\begin{itemize}
+    \item 2003--2008 oil price surge: predominantly aggregate demand;
+    \item 2008 collapse: fall in aggregate demand + unwinding of precautionary positions;
+    \item 2014--2016 decline: persistent positive supply shocks (shale expansion).
+\end{itemize}
+
+\section{Mapping Structural Shocks to Price Trajectories}
+\label{sec:shock-mapping}
+
+To generate the scenario-based projections in Chapter~\ref{ch:stress},
+structural shocks must be translated into paths for the level of the real WTI
+price. Since the VAR is estimated on stationary log-differences, the impulse
+responses are first cumulated to obtain the effect of each shock on the log
+level of the real price.
+
+Let $\theta_h^{(j)}$ denote the \emph{cumulated} impulse response of log real
+WTI at horizon $h$ to a unit structural shock $j \in \{s,d,p\}$ (flow supply,
+aggregate demand, precautionary). For a shock of magnitude $\varepsilon_j$, the
+deviation of log real WTI from its baseline path at horizon $h$ is
+
+\[
+    \Delta \log \text{WTI}_{t+h}
+    \;=\; \varepsilon_j \, \theta_h^{(j)}.
+\]
+
+Given a baseline real price level $P_0$, the corresponding price path in levels
+is obtained by exponentiating these deviations:
+
+\[
+    P_{t+h}^{(j)}
+    \;=\;
+    P_0 \exp\!\big( \varepsilon_j \, \theta_h^{(j)} \big).
+\]
+
+This mapping is implemented in \texttt{extract\_wti\_irf\_from\_var.m}, which
+reads the SVAR impulse responses, cumulates the log-difference responses and
+returns scenario-specific trajectories for the real WTI price. These paths are
+then used in Chapter~\ref{ch:stress} to construct the baseline, supply-shock
+and demand-shock scenarios for the stress-testing exercise.

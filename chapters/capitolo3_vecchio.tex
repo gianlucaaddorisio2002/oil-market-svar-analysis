@@ -1,0 +1,182 @@
+\chapter{Empirical Analysis}
+\label{chap:empirical}
+
+This chapter presents the empirical results of the econometric analysis conducted on the oil market. After having highlighted in Chapter~1 the limits of static OLS models in capturing oil price dynamics, and having built in Chapter~2 a coherent and stationary dataset, in this section we estimate a structural VAR model and analyse: 
+\begin{itemize}
+    \item the dynamic response of the oil price to structural shocks (IRF);
+    \item the forecast error variance decomposition (FEVD);
+    \item the historical decomposition of shocks (Historical Decomposition).
+\end{itemize}
+
+The objective is to identify the main mechanisms that drive the variation of the real oil price and to assess the economic role of the three fundamental shocks in the literature:
+\emph{supply}, \emph{aggregate demand} and \emph{oil-specific (precautionary) demand}.
+
+% ============================================================
+\section{OLS vs VAR: preliminary evidence}
+% ============================================================
+
+Chapter~1 showed that the static OLS model fails to describe oil price dynamics. The main issues were:
+
+\begin{itemize}
+    \item very low explanatory power ($R^2 \approx 0.03$);
+    \item autocorrelated, heteroscedastic residuals with heavy tails;
+    \item strong instability of coefficients across time subintervals;
+    \item statistical significance that is not economically interpretable (``significant'' coefficient but null effect).
+\end{itemize}
+
+This evidence confirms the strongly dynamic and non-linear nature of the oil market, which cannot be modelled with a static approach. The literature (Kilian, 2009; Kilian \& Murphy, 2014) emphasises that the response of fundamental variables to demand and supply manifests over time and through different channels.
+
+These limitations motivate the use of a VAR model, which allows:
+\begin{itemize}
+    \item incorporating the time dependence of the variables;
+    \item identifying structural shocks;
+    \item analysing the propagation of shocks through IRFs;
+    \item evaluating which shocks drive price variance through FEVD.
+\end{itemize}
+
+% ============================================================
+\section{VAR Estimation Results}
+% ============================================================
+
+\subsection{Model Fit and Diagnostics}
+
+Following the procedure described in Chapter~\ref{chap:data-methods}, a VAR(7) model was estimated, selected through an iterative approach based on:
+
+\begin{itemize}
+    \item dynamic stability of the system (all eigenvalues within the unit circle);
+    \item absence of residual autocorrelation (Ljung--Box test).
+\end{itemize}
+
+The estimated model satisfies both conditions and is therefore suitable for the identification of structural shocks.
+
+\subsection{Structural Identification}
+
+The initial identification was obtained through Cholesky decomposition, with ordering consistent with the literature:
+\[
+\Delta \text{Production}_t,\,
+\Delta \text{REA}_t,\,
+\Delta \text{Inventories}_t,\,
+\Delta \text{WTI}^{real}_t.
+\]
+
+This ordering reflects:
+\begin{itemize}
+    \item the rigidity of supply in the very short run (Kilian, 2009);
+    \item the immediate responsiveness of the price to demand shocks;
+    \item the role of inventories in capturing the \emph{precautionary} component.
+\end{itemize}
+
+The results illustrated below are therefore consistent with the three fundamental shocks in the literature.
+
+% ============================================================
+\section{Impulse Response Functions (IRFs)}
+% ============================================================
+
+Figures~\ref{fig:irf_supply}--\ref{fig:irf_precautionary} show the IRFs of the real oil price in response to the three structural shocks.
+
+\subsection{Supply Shock}
+\label{sec:irf_supply}
+
+The response of WTI to a negative supply (production) shock is moderate and short-lived:
+\begin{itemize}
+    \item negative initial impact;
+    \item subsequent recovery within 4--6 months;
+    \item return to zero after about one year.
+\end{itemize}
+
+The overall effect is weak, confirming the limited relevance of supply shocks in the short run, as highlighted by Kilian (2009) and Kilian \& Murphy (2014).
+
+\subsection{Aggregate Demand Shock}
+\label{sec:irf_demand}
+
+A positive global demand shock generates:
+\begin{itemize}
+    \item a temporary increase in the oil price;
+    \item non-persistent effects in the medium term;
+    \item oscillations that die out within a few quarters.
+\end{itemize}
+
+The impact is stronger than that of the supply shock, but still modest.  
+The global business cycle (REA) influences oil prices, but it is not the main driver in the sample analysed.
+
+\subsection{Oil-Specific / Precautionary Demand Shock}
+\label{sec:irf_precautionary}
+
+The precautionary shock is the one that generates the most pronounced response:
+\begin{itemize}
+    \item WTI increases rapidly and more persistently than in the other shocks;
+    \item the peak occurs around 8--10 months;
+    \item the return to baseline is gradual.
+\end{itemize}
+
+This shock reflects changes in expectations and in the speculative component of oil demand, in line with Kilian’s (2009) interpretation, according to which oil-specific demand explains a large portion of price fluctuations.
+
+% ============================================================
+\section{Forecast Error Variance Decomposition (FEVD)}
+% ============================================================
+
+The FEVD provides information on the share of oil price variance explained by each structural shock.
+
+The main results are:
+
+\begin{itemize}
+    \item supply shocks: \textbf{2.7\%};
+    \item aggregate demand shocks: \textbf{5.9\%};
+    \item precautionary shocks: \textbf{9.8\%};
+    \item residual/idiosyncratic component: \textbf{over 80\%}.
+\end{itemize}
+
+These values indicate that:
+\begin{itemize}
+    \item the fundamental shocks explain only a limited portion of price variance;
+    \item most of oil price dynamics is driven by unobserved specific shocks;
+    \item the precautionary component is the most relevant among the three structural shocks.
+\end{itemize}
+
+This result is surprising but consistent with the literature:  
+Kilian \& Murphy (2014) show that oil-specific shocks can explain a large part of price variation, whereas supply shocks play a very limited role.
+
+% ============================================================
+\section{Historical Decomposition}
+% ============================================================
+
+Historical decomposition allows us to assess which shocks have contributed, over time, to the observed fluctuations in the price.
+
+In the sample analysed:
+
+\begin{itemize}
+    \item supply shocks contribute only in isolated episodes (minor geopolitical events);
+    \item aggregate demand shocks have modest effects, limited to periods of cyclical slowdown;
+    \item precautionary shocks explain most of the directional movements;
+    \item the residual component dominates most of the price dynamics.
+\end{itemize}
+
+This picture confirms that the oil price is mainly driven by factors that are not directly observable in the fundamental variables (production, global cycle, inventories).
+
+% ============================================================
+\section{Synthesis of Empirical Findings}
+% ============================================================
+
+The empirical analysis leads to three main conclusions:
+
+\begin{enumerate}
+    \item \textbf{Supply shocks play a marginal role}.  
+    Weak effect in the IRFs and very low share of variance in the FEVD.
+    
+    \item \textbf{Aggregate demand shocks do not dominate price dynamics}.  
+    Visible but non-persistent impact; modest FEVD.
+
+    \item \textbf{Precautionary shocks are the main observed drivers}.  
+    More persistent IRFs; larger FEVD than the other shocks.
+\end{enumerate}
+
+In summary, oil price dynamics in the sample analysed is
+\emph{only weakly sensitive to macroeconomic fundamentals} and is more strongly driven
+by unobserved oil-specific shocks.
+
+This result explains:
+\begin{itemize}
+    \item the failure of the OLS model described in Chapter~\ref{chap:intro};
+    \item the need for a dynamic and structural model;
+    \item the crucial role of expectations, uncertainty, and oil-specific demand.
+\end{itemize}

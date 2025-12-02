@@ -1,0 +1,623 @@
+\chapter{Data and Econometric Methodology}
+\label{ch:data-methods}
+
+\section{Overview}
+
+This chapter documents the construction of the dataset and the econometric
+framework that underpins the empirical analysis of the oil market and the
+subsequent stress–testing and hedging applications. 
+The objective is twofold. 
+First, to provide a transparent account of each transformation applied to the
+raw data, so that the analysis can be replicated and extended.
+Second, to show why a multivariate dynamic specification --- in particular a
+structural vector autoregression (SVAR) --- is required to model the joint
+behaviour of oil prices, U.S.\ production, OECD activity and inventories,
+instead of static regression models.
+
+The empirical work is based on monthly data from January 1990 to December
+2024. 
+The data are sourced from standard repositories in the energy economics
+literature: the Federal Reserve Bank of St.\ Louis (FRED), the U.S.\ Energy
+Information Administration (EIA), the Dallas Fed Globalization Institute and
+OECD statistics.\footnote{See \textcite{WTI_FRED, CPI_FRED, IGREA_DallasFed,
+OilProduction_EIA, Inventories_EIA, JetFuel_EIA} for the official
+documentation of the underlying series.} 
+All series are imported, cleaned and merged by the \textsc{MATLAB} script
+\texttt{build\_oil\_dataset.m}, which creates three core objects:
+
+\begin{enumerate}[label=(\roman*)]
+    \item a timetable \texttt{All} containing the main variables in levels
+    (nominal and real), at a common monthly frequency;
+    \item a timetable \texttt{All\_d} with stationary transformations
+    (log-differences and standardised cycles) used in the pre--VAR diagnostics;
+    \item a timetable \texttt{ALL\_VAR} with the transformed variables entering
+    the structural VAR.
+\end{enumerate}
+
+Figure~\ref{fig:var-series} anticipates the final VAR variables, while the
+remaining figures in this chapter summarise the unit root and diagnostic tests,
+the lag selection and the in-sample fit of the VAR model.
+Tables~\ref{tab:data_sources}--\ref{tab:lag_selection} report the
+corresponding numerical results.
+
+\section{Data Sources}
+\label{sec:data-sources}
+
+\subsection{Real WTI Crude Oil Price}
+
+The benchmark price variable is the West Texas Intermediate (WTI) spot price at
+Cushing, Oklahoma, obtained from the FRED series \texttt{MCOILWTICO}.\footnote{See
+\textcite{WTI_FRED}.}
+The original data are quoted in U.S.\ dollars per barrel and correspond to
+monthly averages of daily prices.
+To account for inflation, nominal WTI prices are deflated by the U.S.\ Consumer
+Price Index for All Urban Consumers (CPI-U, series \texttt{CPIAUCSL}).\footnote{See
+\textcite{CPI_FRED}.}
+The real price index is constructed as
+\[
+    \text{WTI}^{\text{real}}_t =
+    100 \times \frac{\text{WTI}^{\text{nom}}_t}{\text{CPI}_t},
+\]
+so that the base value of the index is 100 in the first observation of the
+sample.
+This transformation is consistent with the treatment of real oil prices in
+\textcite{Kilian2009, KilianMurphy2014, BaumeisterHamilton2019}.
+
+Although Brent is often employed as the benchmark for global crude oil pricing,
+this study adopts the real WTI price as the reference series. This choice is
+consistent with the U.S.-centred nature of the dataset — which combines WTI
+prices with U.S.\ production and inventory data — and with the focus on risk
+management for an airline hedging exposures linked to WTI-denominated futures
+and spot prices. The reliance on WTI rather than Brent implies that the
+resulting price dynamics are most directly informative for the U.S.\ oil
+market; this limitation is discussed further in the concluding chapter.
+\subsection{U.S.\ Crude Oil Production}
+
+The production variable is used to proxy the flow supply of crude oil.
+In the baseline dataset, production is measured using monthly U.S.\ crude oil
+output from the EIA International Energy Statistics, expressed in thousand
+barrels per day.\footnote{See \textcite{OilProduction_EIA} for the reference to
+the EIA production series.}
+U.S.\ production is a natural driver of WTI dynamics because the benchmark is
+physically delivered in the United States and domestic supply responds
+strongly to technological and regulatory shifts, such as the shale oil
+expansion in the mid-2000s.
+
+Unlike \textcite{KilianMurphy2014}, who rely on world crude oil production as a
+measure of global flow supply, this study uses U.S.\ output as the supply
+indicator. Consequently, the identified supply disturbance in the SVAR should
+be interpreted as a U.S.-centred WTI-market supply shock rather than as a fully
+global flow supply shock. This U.S.\ focus is consistent with the broader
+dataset design, which combines WTI prices with U.S.\ production and inventory
+data.
+
+Following the literature on oil market VAR models, production enters the
+structural specification in logarithms, allowing shocks to be interpreted as
+percentage changes in supply \parencite{KilianMurphy2014,KilianZhou2018}.
+
+\subsection{OECD Industrial Activity}
+
+Global demand conditions are proxied by an index of industrial activity for the
+OECD aggregate. 
+The underlying series is an industrial production index compiled by OECD, with
+base year equal to 2015 and monthly frequency.
+In the early SVAR literature, global demand for industrial commodities is
+typically measured by the Kilian index of global real economic activity
+(REA), built from ocean freight rates \parencite{Kilian2009}. 
+However, subsequent work has highlighted several shortcomings of REA,
+including sensitivity to shipping market reforms, structural breaks around
+China's WTO accession and limited information content in the post-2010 period
+\parencite{Kilian2019, KilianZhou2018}. 
+In the present dataset, REA-based specifications display weaker statistical
+properties than OECD industrial activity: OLS regressions with REA produce
+less stable coefficients and more severe residual autocorrelation relative to
+OECD, and VAR models with REA show poorer diagnostics. 
+For these reasons, OECD is adopted as a more robust proxy for global demand
+conditions in the identification of aggregate demand shocks, in line with the
+recent re-assessment of demand indicators in \textcite{Kilian2019}.
+
+\subsection{U.S.\ Oil Inventories}
+
+Crude oil and refined product inventories play a central role in models where
+precautionary demand and speculative storage link expectations about future
+scarcity to current prices \parencite{KilianMurphy2014, BaumeisterHamilton2019}. 
+Inventory data are obtained from the EIA's International Energy Database as the
+total end-of-period stocks of crude oil and petroleum products in the United
+States.\footnote{See \textcite{Inventories_EIA}.} 
+The data are expressed in million barrels and reported at monthly frequency.
+As discussed in \textcite{KilianMurphy2014}, it is not the level of inventories
+per se but unexpected changes in stocks that identify precautionary demand
+shocks. 
+Consequently, in the structural VAR inventories are transformed to logarithms
+and subsequently filtered to obtain stationary deviations around trend.
+
+\subsection{Jet Fuel Prices (U.S.\ Gulf Coast)}
+
+For the hedging application in later chapters, jet fuel prices are also
+required. 
+The relevant series is the kerosene-type jet fuel spot price at the U.S.\ Gulf
+Coast, expressed in dollars per gallon and reported at monthly frequency by the
+EIA.\footnote{See \textcite{JetFuel_EIA}.}
+These data are imported and stored in the variable \texttt{JetFuel\_USGC} in
+\texttt{All}. 
+While jet fuel does not enter the VAR directly, it is linked to real WTI
+prices through a pass-through regression in the hedging module.
+
+\subsection{Inflation Measure and Deflation}
+
+The CPI-U index serves both as a deflator for nominal oil prices and as a
+proxy for general price-level movements in the U.S.\ economy
+\parencite{CPI_FRED}. 
+After reshaping the CPI series to monthly frequency and aligning the date
+conventions, the \texttt{build\_oil\_dataset.m} script constructs the real WTI
+series and then discards the nominal WTI to avoid redundancy. 
+The CPI series itself does not enter the VAR system but is retained for
+consistency checks and potential extensions involving real interest rates or
+inflation dynamics.
+
+\subsection{Summary of Data Sources}
+A detailed description of data construction, frequency alignment and
+pre-VAR diagnostics is provided in Appendix~A.
+
+Table~\ref{tab:data_sources} summarises all variables employed in the analysis,
+their definitions, units of measurement and original sources.
+\begin{table}[H]
+\centering
+\begin{threeparttable}
+\caption{Data sources and variable definitions.}
+\label{tab:data_sources}
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{p{3.0cm}p{6cm}p{3cm}p{2.0cm}}
+\toprule
+\textbf{Variable} & \textbf{Definition} & \textbf{Source} & \textbf{Frequency} \\
+\midrule
+WTI\_real & Real West Texas Intermediate crude oil price (index, 1990=100) &
+FRED, EIA \parencite{WTI_FRED} & Monthly \\
+
+Production & U.S.\ crude oil production (thousand barrels per day) &
+EIA \parencite{OilProduction_EIA} & Monthly \\
+
+OECD (IPI)\tnote{*} &
+OECD industrial activity indicator, Dallas Fed &
+OECD, Dallas Fed \parencite{IGREA_DallasFed, Kilian2019} &
+Monthly \\
+
+Inventories & U.S.\ crude oil and petroleum product ending stocks (million barrels) &
+EIA \parencite{Inventories_EIA} & Monthly \\
+
+JetFuel\_USGC \tnote{**} & Kerosene-type jet fuel spot price, U.S.\ Gulf Coast (USD per gallon) &
+EIA \parencite{JetFuel_EIA} & Monthly \\
+
+CPI \tnote{**} & Consumer Price Index for All Urban Consumers (1982–84=100) &
+BLS/FRED \parencite{CPI_FRED} & Monthly \\
+\bottomrule
+\end{tabular}
+
+    % Definizione del testo della nota all'interno di tablenotes
+    \begin{tablenotes}
+        \item[*] Industrial Production Index
+    \end{tablenotes}
+   \begin{tablenotes}
+        \item[**] They are not part of the core VAR system but are needed for the hedging module / deflation and consistency checks
+    \end{tablenotes}
+
+    \end{threeparttable}
+    % Fine dell'ambiente threeparttable
+\end{table}
+
+
+
+\section{Preprocessing and Data Harmonisation}
+\label{sec:preprocessing}
+
+All data management is implemented in \texttt{build\_oil\_dataset.m}. 
+The goal is to harmonise the series in terms of time index, frequency and
+numeric format, and to prepare both stationary and non-stationary
+transformations consistent with the subsequent VAR specification.
+
+\subsection{Date Alignment and Monthly Frequency}
+
+Source files differ in their original date conventions: some use calendar dates
+(``yyyy-mm-dd''), others indicate only year and month (``yyyy-mm''), and some
+rely on textual month labels. Each series is first converted to a
+\texttt{table} with explicit date and value columns and then mapped to a
+\texttt{datetime} vector using appropriate input formats and locale settings,
+so that heterogeneous date formats and locales are harmonised in a consistent
+way. All dates are shifted to the first day of the corresponding month to
+ensure that the time index is strictly monthly and comparable across series.
+
+The individual series are then recast as \texttt{timetable} objects and
+synchronised by intersecting their support, so that the common sample only
+retains months in which all variables are observed. This procedure implicitly
+drops months with missing entries in at least one series and yields a balanced
+panel of monthly observations from 1990:1 to 2024:12.
+
+\subsection{Numeric Cleaning}
+
+Many of the raw files encode numbers using commas as thousands separators or
+as decimal separators, depending on the local convention. To avoid parsing
+issues, all numeric entries are first converted to strings and then cleaned
+with a simple regular-expression routine that removes non-numeric separators
+before being cast to double precision. This ensures that subsequent arithmetic
+operations produce consistent results and that no artefacts arise from
+locale-specific decimal formats.
+
+\subsection{Transformations and Construction of \texttt{All\_d} and \texttt{ALL\_VAR}}
+
+After converting the nominal WTI series into real terms using the CPI deflator, the
+dataset \texttt{All} stores the variables at cleaned monthly frequency:
+\texttt{WTI\_real}, \texttt{Production}, \texttt{OECD}, \texttt{Inventories},
+\texttt{JetFuel\_USGC} and \texttt{CPI}. 
+Two parallel transformations are then implemented in \textsc{MATLAB}.
+
+\paragraph{Stationary transformations for VAR and preliminary diagnostics.}
+All series intended for OLS, unit root analysis and VAR estimation are transformed into
+stationary representations. In particular,
+\begin{align*}
+    \Delta \log \text{WTI}^{\text{real}}_{t} &=
+        \log \text{WTI}^{\text{real}}_{t} - \log \text{WTI}^{\text{real}}_{t-1}, \\
+    \Delta \log \text{Prod}_{t} &=
+        \log \text{Prod}_{t} - \log \text{Prod}_{t-1}, \\
+    \Delta \log \text{Inv}_{t} &=
+        \log \text{Inv}_{t} - \log \text{Inv}_{t-1}, \\
+    \Delta \text{OECD}_{t} &= \text{OECD}_{t} - \text{OECD}_{t-1}.
+\end{align*}
+
+All differenced series are then standardised to zero mean and unit variance, and stored
+in the structure \texttt{All\_d} with the suffix \texttt{\_DL}
+(\texttt{WTI\_real\_DL}, \texttt{Production\_DL}, \texttt{OECD\_DL},
+\texttt{Inventories\_DL}, \texttt{JetFuel\_DL}). 
+These stationary $z$–score transforms are used in the pre--VAR OLS regressions,
+unit root tests, rolling-window diagnostics (Section~2.5) and, crucially, as inputs for
+the reduced-form VAR.
+
+\paragraph{VAR state vector and construction of \texttt{ALL\_VAR}.}
+In line with the econometric evidence in Section~\ref{sec:unit-root}, the reduced-form
+VAR is estimated directly on the stationary $\Delta\log$ (or difference) transforms,
+rather than on log levels.
+The four-dimensional state vector is defined as
+\[
+    y_{t} =
+    \begin{bmatrix}
+        \text{Production\_DL}_{t} \\
+        \text{OECD\_DL}_{t} \\
+        \text{WTI\_real\_DL}_{t} \\
+        \text{Inventories\_DL}_{t}
+    \end{bmatrix},
+\]
+where the ordering reflects the economic structure of the oil market:
+flow supply, aggregate demand, spot price and precautionary/storage
+demand.\footnote{This ordering is maintained throughout the analysis: reduced-form
+VAR, Cholesky benchmark identification and the sign-restricted SVAR in
+Chapter~3.}
+For convenience, these four series are stacked in the matrix \texttt{ALL\_VAR}, which
+contains the stationary, standardised VAR data used in all subsequent estimations.
+
+Figure~\ref{fig:var-series} reports the trajectories of the VAR variables in
+$\Delta\log$ (or difference) form, rescaled to zero mean and unit variance.
+The four transformed series display pronounced low-frequency swings and episodic
+extremes (2008 crisis, COVID-19, major geopolitical shocks), but no visible
+drift, consistent with the unit root behaviour in levels documented in
+Section~\ref{sec:unit-root}.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=1.0\textwidth]{immagine.png}
+    \caption{Stationary VAR series, 1990--2024.
+    The panels display the standardised $\Delta\log$ real WTI price,
+    $\Delta\log$ crude oil production, $\Delta$ OECD industrial activity and
+    $\Delta\log$ petroleum inventories (all series transformed to zero mean and
+    unit variance).}
+    \label{fig:var-series}
+\end{figure}
+
+\section{Stationarity and Unit Root Tests}
+\label{sec:unit-root}
+
+Before specifying the VAR in log levels, it is necessary to assess the order of
+integration of each series and ensure that the resulting system is
+econometrically well behaved. Standard unit root tests are therefore applied to
+both the original level series stored in \texttt{All} and to the stationary
+transformations in \texttt{All\_d}.
+
+Augmented Dickey–Fuller (ADF) tests are run for each variable in levels,
+including a constant and a linear trend. For the real WTI price,
+production and inventories, the unit root null cannot be rejected at
+conventional significance levels, in line with the literature documenting
+non-stationarity in real oil prices and macroeconomic aggregates.
+In contrast, the OECD activity index appears trend–stationary, with the
+ADF statistic rejecting the unit root null at the 1\% level (Table~\ref{tab:adf_levels}).
+Given the mixed evidence and for consistency across variables, the subsequent
+analysis is conducted on transformed series.
+
+\begin{table}[H]
+\centering
+\caption{ADF unit root tests for variables in levels.}
+\label{tab:adf_levels}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Series} & \textbf{Specification} & \textbf{ADF statistic} & \textbf{p-value} \\
+\midrule
+WTI\_real      & constant + trend & -2.083 & 0.5514 \\
+Production     & constant + trend & -1.461 & 0.8411 \\
+OECD           & constant + trend & -4.060 & 0.0082 \\
+Inventories    & constant + trend & -1.020 & 0.9388 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+    When the same tests are applied to first differences (or, for OECD activity,
+    to the cyclical component), the unit root null is strongly rejected for all
+    series, with p-values around 0.001, as shown in Table ~ \ref{tab:adf_diffs}.
+    Given the strong evidence of unit roots in the level series, the VAR is specified in terms of stationary log-differences (and, for OECD activity, detrended cyclical components). This choice eliminates stochastic trends from the state vector and preserves the validity of standard VAR inference without imposing explicit cointegration restrictions. Long-run effects on the levels of the variables are then recovered by cumulating the impulse responses of log-differences, as discussed in Chapter 3.
+
+
+\begin{table}[H]
+\centering
+\caption{ADF unit root tests for transformed series.}
+\label{tab:adf_diffs}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Series} & \textbf{Specification} & \textbf{ADF statistic} & \textbf{p-value} \\
+\midrule
+WTI\_real\_DL          & constant & -15.863 & 0.0010 \\
+Production\_DL         & constant & -23.385 & 0.0010 \\
+OECD\_DL / OECD\_cycle & constant & -14.844 & 0.0010 \\
+Inventories\_DL        & constant & -13.960 & 0.0010 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Additional test statistics and residual diagnostics are reported in
+Appendix~A.
+
+
+\section{Exploratory OLS Evidence and Limitations}
+\label{sec:ols-prevar}
+
+As a preliminary step, static regression models are estimated to gauge whether
+simple linear relationships between real oil prices and fundamentals can
+adequately describe the data. 
+These regressions are implemented in \texttt{ols\_prevar\_check.m} and form the
+basis for arguing in favour of a dynamic multivariate specification.
+\subsection{Baseline Static Regression}
+
+As a starting point, a simple static specification relates the log real WTI price
+to fundamental variables in levels. Specifically,
+\[
+    \log \text{WTI}^{\text{real}}_t = 
+    \alpha + \beta_1 \log \text{Prod}_t +
+    \beta_2 \text{OECD}_t +
+    \beta_3 \log \text{Inv}_t + u_t,
+\]
+where all regressors enter contemporaneously and no lags are included.
+In line with \textcite{Kilian2009, BaumeisterHamilton2019}, this static
+log–linear regression explains only a limited share of the variation in real oil
+prices: the adjusted $R^2$ remains modest, and the residuals display serial correlation,
+heteroskedasticity and non–normality, as indicated by the Ljung--Box $Q$-statistic,
+the Breusch--Pagan test and the Jarque--Bera normality test reported in
+Table~\ref{tab:ols_diag}.
+These diagnostics highlight that a purely contemporaneous specification is
+inadequate and motivate the move to a multivariate dynamic VAR framework.
+
+
+
+\begin{table}[H]
+\centering
+\caption{Diagnostic tests for static OLS regression of real WTI.}
+\label{tab:ols_diag}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Test} & \textbf{Statistic} & \textbf{p-value} & \textbf{Conclusion} \\
+\midrule
+Ljung--Box (12 lags) & 34.41  & 0.0006   & serial correlation present   \\
+Breusch--Pagan       & 27.74  & 0.0000   & heteroscedasticity present   \\
+Jarque--Bera         & 197.17 & $<0.001$ & residuals non-normal         \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Structural Instability and Rolling Windows}
+
+To assess the stability of the OLS relationship over time,
+\texttt{ols\_windows.m} re-estimates the static regression on rolling subsamples
+(e.g.\ 10- or 15-year windows). 
+The resulting sequences of coefficients reveal substantial time variation:
+production and inventory elasticities change sign across subsamples, and the
+effect of OECD on real WTI becomes weaker or stronger depending on the period.
+This is consistent with evidence from structural break tests such as those of
+\textcite{Brown1975, BaiPerron2003}, which typically identify multiple
+breakpoints in macroeconomic relationships over the last four decades.
+
+The instability of static coefficients, combined with unsatisfactory residual
+diagnostics, confirms that the oil market is governed by dynamic interactions
+and time-varying responses.
+This motivates the move to a VAR framework, where lagged dependencies and
+feedback effects can be explicitly modelled.
+
+\section{VAR Model Specification}
+\label{sec:var-spec}
+
+\subsection{Reduced-Form VAR}
+
+The baseline multivariate model is a reduced-form VAR in log levels (for oil prices, production and inventories) and in levels for OECD activity:
+\[
+    y_t = c + A_1 y_{t-1} + \cdots + A_p y_{t-p} + u_t,
+\]
+where $y_t = (\text{OECD\_level}_t, \text{Prod\_log}_t, \text{WTI\_log}_t,
+\text{Inv\_log}_t)'$, $c$ is a vector of intercepts, $A_i$ are $4\times4$ lag
+matrices, and $u_t$ is a vector of reduced-form innovations with covariance
+matrix $\Sigma_u$. 
+The model is estimated by ordinary least squares equation-by-equation, which is
+efficient under the assumption of Gaussian errors and homoscedasticity
+\parencite{Sims1980, Lutkepohl2005}.
+
+The choice of working with log levels --- as opposed to differenced series ---
+follows the practice in the structural oil market literature and allows for the
+possibility of long-run co-movements between oil prices and fundamentals
+\parencite{Kilian2009, BaumeisterHamilton2019}. 
+At the same time, a sufficiently rich lag structure is included to ensure that
+the VAR residuals are approximately white noise and that the system is
+dynamically stable.
+A detailed description of the reduced-form VAR specification, lag selection
+and stability diagnostics is provided in Appendix~B.
+
+
+\subsection{Lag Length Selection}
+
+Lag length is selected empirically by combining dynamic stability and residual
+whiteness. 
+In the \texttt{var\_main.m} script, a sequence of VAR($p$) models with
+$p = 1,\dots,15$ is estimated, and for each specification two diagnostics are
+recorded: (i) whether all eigenvalues of the companion matrix lie inside the
+unit circle and (ii) the minimum $p$-value of a Ljung--Box portmanteau test for
+serial correlation in the residuals of the real WTI equation, based on the
+stationary representation in \texttt{All\_d}. 
+The results are summarised in Table~\ref{tab:lag_selection}.
+
+\begin{table}[H]
+\centering
+\caption{Empirical VAR lag selection based on stability and Ljung--Box test on residuals (\texttt{All\_d}, equation for real WTI).}
+\label{tab:lag_selection}
+
+\begin{tabular}{lcc}
+\toprule
+\textbf{Lag $p$} & \textbf{Stable} & $\boldsymbol{\min LB}$ \textbf{$p$-value} \\
+\midrule
+ 1  & Yes & 0.0000 \\
+ 2  & Yes & $4.65\times10^{-13}$ \\
+ 3  & Yes & $9.61\times10^{-12}$ \\
+ $\vdots$ & $\vdots$ & $\vdots$ \\   % <-- salta i lags intermedi
+11  & Yes & $2.92\times10^{-8}$  \\
+12  & Yes & 0.7523 \\
+13  & Yes & 0.5111 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.25cm}
+\raggedright\footnotesize
+Note: Although only selected lag orders are reported, all VAR($p$) specifications
+up to $p=15$ are dynamically stable. For $p \le 11$ the minimum Ljung--Box
+$p$-values are effectively zero, indicating strong residual autocorrelation.
+Starting from $p = 12$, the $p$-values exceed conventional significance
+thresholds, signalling that remaining serial dependence is modest. On this
+basis, a VAR(12) is adopted as the baseline specification.
+\end{table}
+
+
+
+All VAR($p$) specifications turn out to be dynamically stable. 
+However, for $p \leq 11$ the Ljung--Box $p$-values are effectively zero,
+indicating strong residual autocorrelation and insufficient dynamic structure.
+Starting from $p = 12$, the portmanteau $p$-values exceed conventional
+significance thresholds, signalling that the remaining serial dependence is
+modest and compatible with a well-specified VAR.
+
+On this basis, a VAR(12) is adopted as the baseline specification. 
+This choice is also consistent with the monthly frequency of the data and with
+the lag length commonly used in the structural oil market literature
+\parencite{Kilian2009, KilianMurphy2014}, while preserving a reasonable number
+of degrees of freedom for estimation and subsequent structural analysis.
+
+\subsection{Residual Diagnostics and Stability}
+
+After estimating the VAR(12), standard diagnostics are carried out to ensure
+that the reduced-form specification is adequate. 
+Portmanteau tests for serial correlation in the residuals confirm that the
+dynamic structure absorbs most temporal dependence, with no evidence of
+remaining autocorrelation at conventional lags. 
+Tests for normality based on Jarque--Bera and Kolmogorov--Smirnov statistics,
+applied to the standardized residuals, reveal departures from Gaussianity and
+some signs of heteroscedasticity, which is not surprising given the presence of
+large oil price swings and episodic volatility clustering. 
+Nevertheless, the VAR residuals are sufficiently well behaved for the purpose
+of structural identification and impulse response analysis.
+
+Stability is examined by inspecting the eigenvalues of the companion matrix:
+all lie strictly inside the unit circle, confirming that the VAR is dynamically
+stable. 
+This property is crucial for the interpretation of impulse responses and for
+the generation of stress-test scenarios in later chapters.
+
+\subsection{In-Sample Fit}
+
+To provide a sense of how well the VAR captures the dynamics of the real oil
+price, the script \texttt{var\_fit\_vs\_actual\_WTI.m} computes one-step-ahead
+in-sample forecasts for the VAR(12) and compares the fitted values of
+\texttt{WTI\_log} with the observed series. 
+Figure~\ref{fig:var-fit-wti} plots the actual and fitted values. 
+The VAR tracks medium-run movements in real WTI reasonably well, including the
+run-up in the early 2000s, the collapse during the global financial crisis, and
+the shale-driven adjustments in the 2010s. 
+Short-lived spikes and collapses are not perfectly matched, reflecting the
+limits of linear Gaussian models in capturing extreme events, but the overall
+fit is markedly superior to that of the static OLS regression in
+Section~\ref{sec:ols-prevar}.
+
+\begin{figure}[H]
+    \centering
+      \includegraphics[width=1\textwidth]{fig_var_fit_wti.pdf}
+    \caption{In-sample VAR(12) fit vs actual log real WTI price. The VAR
+    captures medium-run fluctuations in the real oil price, while short-lived
+    extremes remain harder to match.}
+    \label{fig:var-fit-wti}
+\end{figure}
+
+\section{Structural Identification Strategy}
+\label{sec:identification}
+
+The reduced-form VAR alone does not provide economically meaningful
+interpretations of shocks, since the innovations $u_t$ are linear combinations
+of underlying structural disturbances. 
+Following the oil market literature, the thesis adopts a structural VAR (SVAR)
+approach with sign and elasticity restrictions to identify three economically
+interpretable shocks: a (US-centred) flow supply shock, an aggregate demand
+shock and a precautionary (inventory) demand shock
+\parencite{Kilian2009,KilianMurphy2014,BaumeisterHamilton2019}.
+
+Let $\varepsilon_t$ denote the vector of structural shocks, and $B$ the
+contemporaneous impact matrix such that
+\[
+    u_t = B \varepsilon_t, \qquad \Sigma_u = B B'.
+\]
+Identification is achieved by imposing sign restrictions on the impulse
+responses of $y_t$ to each column of $B$ over a short horizon, combined with
+bounds on the short-run price elasticities of supply and demand. The procedure
+builds on the framework and formal identification results of
+\textcite{RubioRamirez2010}. The specific numerical ranges for the elasticity
+bounds are reported in Section~3.3.2.
+
+A flow supply shock is required to reduce crude oil production and increase
+the real oil price on impact, while its effect on inventories is either
+negative or slightly positive, reflecting the drawdown of stocks in response to
+supply shortfalls. Since the supply indicator in this thesis is US crude oil
+output rather than world production, this disturbance is best interpreted as a
+supply shock to the US WTI market, not as a fully global flow supply shock in
+the sense of \textcite{KilianMurphy2014}. An aggregate demand shock must
+increase OECD activity, production and the oil price jointly, consistent with
+strong global demand for industrial commodities. A precautionary demand shock,
+in turn, is characterised by an increase in inventories and real oil prices,
+while its effect on production and OECD activity is more muted
+\parencite{KilianMurphy2014}. Plausible bounds on the short-run price
+elasticities of supply and demand further constrain the admissible
+decompositions of $\Sigma_u$.
+
+The actual implementation of sign restrictions is carried out in
+\texttt{svar\_sign\_restrictions.m}, which draws candidate orthogonal matrices,
+rotates the Cholesky factor of $\Sigma_u$, and retains only those rotations
+that satisfy the imposed sign and elasticity conditions over the chosen
+horizon. This yields a distribution of admissible impulse responses rather than
+a single point estimate, reflecting the partial nature of identification and
+addressing concerns raised by \textcite{BaumeisterHamilton2019} about
+overconfident structural interpretations.
+
+The identification strategy builds directly on the specification choices
+documented in this chapter: the selection of OECD activity as a robust demand
+proxy, the log-level transformation of WTI, production and inventories, and the
+adoption of a sufficiently rich lag structure to absorb unit root behaviour and
+short-run dynamics. Without these preparatory steps, the structural analysis in
+the subsequent chapter would rest on a fragile econometric foundation.

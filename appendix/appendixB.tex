@@ -1,0 +1,220 @@
+\chapter{VAR--SVAR Framework and Shock Dependence}
+
+\section*{B.1 Reduced-Form VAR Specification}
+
+The reduced-form VAR is estimated on the vector of stationary
+transformations
+\[
+y_t =
+\begin{bmatrix}
+\text{Production}^{DL}_t \\
+\text{OECD\_cycle}_t \\
+\text{WTI}^{DL}_t \\
+\text{Inventories}^{DL}_t
+\end{bmatrix},
+\]
+where $DL$ denotes $\Delta\log$ transformations and
+\texttt{OECD\_cycle} is the cyclical component of the OECD activity index.
+Each component of $y_t$ is standardised to zero mean and unit variance before
+estimation, so that the resulting coefficients and shocks are directly
+comparable across variables.
+
+The VAR($p$) in companion form is
+\[
+y_t = A_1 y_{t-1} + \dots + A_p y_{t-p} + u_t,
+\quad
+u_t \sim (0,\Sigma_u),
+\]
+with the ordering
+\[
+(\text{Production}, \; \text{OECD}, \; \text{WTI}, \; \text{Inventories}).
+\]
+
+Lag-length selection is performed over $p=1,\dots,15$ using a combination of
+information criteria, residual autocorrelation tests and stability checks on
+the companion matrix eigenvalues. All criteria point to relatively long
+dynamics, and residual portmanteau tests reject low-order specifications. A
+lag length of $p=12$ is ultimately selected as a compromise between capturing
+the long adjustment horizons typical of global oil markets and preserving a
+reasonable number of effective observations.
+
+The script \texttt{var\_main.m} implements this procedure and stores the
+estimated coefficient matrices and residuals, which serve as the basis for the
+subsequent structural analysis.
+
+\section*{B.2 Benchmark Cholesky Identification}
+
+As a preliminary step, a recursive (Cholesky) identification is applied to the
+reduced-form residuals $u_t$. The covariance matrix $\Sigma_u$ is factorised as
+$\Sigma_u = P P'$ and the orthogonalised innovations
+$\tilde{\varepsilon}_t = P^{-1} u_t$ are interpreted as shocks ordered according
+to $(\text{Production}, \text{OECD}, \text{WTI}, \text{Inventories})$.
+
+The associated Cholesky impulse responses provide a diagnostic benchmark:
+
+\begin{itemize}
+  \item aggregate-demand disturbances (innovations to OECD activity) account
+  for a large fraction of the forecast error variance of the real WTI price at
+  medium horizons;
+  \item shocks to crude oil production generate modest and short-lived price
+  responses;
+  \item inventory innovations produce noisy and moderately persistent effects.
+\end{itemize}
+
+These patterns are broadly in line with the structural interpretation proposed
+in the literature, but the recursive scheme is inherently sensitive to the
+chosen ordering and cannot be given a fully structural meaning. It is therefore
+used only as a starting point for assessing the plausibility of the data and
+guiding the design of sign restrictions.
+
+\section*{B.3 Structural Identification via Sign Restrictions}
+
+Structural shocks are identified using sign restrictions in the spirit of
+\textcite{KilianMurphy2014}. Let
+\[
+u_t = B \varepsilon_t,
+\]
+where $B$ is the contemporaneous impact matrix and
+$\varepsilon_t = (\varepsilon_t^{s},\varepsilon_t^{d},\varepsilon_t^{p},\varepsilon_t^{\text{other}})'$
+collects the structural disturbances: flow supply ($s$), aggregate demand
+($d$), precautionary (or storage) demand ($p$) and a residual “other” shock.
+
+Starting from a particular decomposition $B_0$ such that $\Sigma_u = B_0 B_0'$,
+a large number of candidate impact matrices are generated via random orthogonal
+rotations $Q$:
+\[
+B = B_0 Q, \qquad Q'Q = I.
+\]
+For each candidate $B$, the corresponding impulse responses are computed and
+retained only if they satisfy the following sign restrictions over a short
+horizon (typically $h=1,\dots,12$):
+
+\begin{itemize}
+  \item \textbf{Flow supply shock} ($\varepsilon^s$): Production $\downarrow$,
+  WTI $\uparrow$;
+  \item \textbf{Aggregate-demand shock} ($\varepsilon^d$): OECD $\uparrow$,
+  Production $\uparrow$, WTI $\uparrow$;
+  \item \textbf{Precautionary/storage shock} ($\varepsilon^p$): WTI $\uparrow$,
+  Inventories $\uparrow$.
+\end{itemize}
+
+Out of 100{,}000 random orthogonal rotations drawn in
+\texttt{svar\_sign\_restrictions.m}, only a handful (six) satisfy all the
+restrictions simultaneously. This low acceptance rate indicates that the
+restrictions are informative and tightly pin down the economically relevant
+decomposition of shocks. All structural results reported in the main text are
+computed as medians across the accepted draws, with percentile bands used to
+capture the remaining identification uncertainty.
+
+\section*{B.4 Structural Impulse Responses and Variance Decomposition}
+
+The structural impulse responses obtained from the accepted $B$ matrices reveal
+a clear pattern:
+
+\begin{itemize}
+  \item aggregate-demand shocks produce the strongest and most persistent
+  increases in the real WTI price, together with sustained increases in
+  production and economic activity;
+  \item flow supply shocks generate moderate but economically meaningful price
+  responses that decay relatively quickly, with production falling on impact
+  and gradually recovering;
+  \item precautionary shocks display hump-shaped short-run dynamics in the oil
+  price and inventories, consistent with temporary inventory accumulation driven
+  by expectations of future scarcity.
+\end{itemize}
+
+The corresponding forecast error variance decomposition (reported in
+Chapter~\ref{ch:empirical}) shows that demand shocks dominate the medium-run
+variance of the real WTI price, while precautionary shocks contribute
+disproportionately to very short-run volatility. Supply shocks play a more
+limited but non-negligible role.
+
+\section*{B.5 Marginal Distributions of Structural Shocks}
+
+To analyse the distributional properties of structural shocks, the accepted
+draws of $(\varepsilon_t^{s},\varepsilon_t^{d},\varepsilon_t^{p})$ are
+assembled and standardised. The script \texttt{fit\_marginal\_shocks.m} then
+fits several parametric families to each marginal by maximum likelihood,
+including Gaussian, Logistic and Student-\emph{t} distributions.
+
+Across all three shocks, Gaussian and Logistic specifications systematically
+underestimate the empirical tail thickness. Student-\emph{t} marginals with
+finite degrees of freedom provide a markedly better fit, capturing both the
+leptokurtosis and, for demand and precautionary shocks, pronounced skewness.
+These findings reinforce the evidence from pre-VAR diagnostics that
+heavy-tailed shocks are a salient feature of oil-market dynamics and motivate
+their use in the copula-based dependence analysis.
+
+\section*{B.6 Copula-Based Dependence}
+
+Dependence among structural shocks is studied using bivariate copulas fitted to
+pairs $(\varepsilon_t^{i},\varepsilon_t^{j})$ after transforming each marginal
+to the unit interval via the fitted Student-\emph{t} distributions. The
+\texttt{copula\_fit\_shocks.m} script compares several families---Gaussian,
+Student-\emph{t}, Clayton, Gumbel and Frank---using pseudo-likelihood criteria.
+
+The main qualitative findings are:
+
+\begin{itemize}
+  \item a Student-\emph{t} copula with low degrees of freedom
+  ($\nu \approx 3.4$) best describes the joint behaviour of aggregate-demand
+  and precautionary shocks, implying strong upper-tail dependence: large
+  positive demand shocks tend to coincide with large positive precautionary
+  shocks;
+  \item dependence between flow supply and precautionary shocks is weaker and
+  more symmetric, with a Frank copula providing the best fit;
+  \item dependence between flow supply and aggregate-demand shocks is moderate
+  and close to elliptical, and can be captured reasonably well by either a
+  Gaussian or a mild Student-\emph{t} copula.
+\end{itemize}
+
+These patterns suggest that episodes of strong global demand are often
+accompanied by inventory-accumulation behaviour and expectation-driven
+pressures, thereby amplifying oil price spikes. The copula analysis is used
+here in a purely \emph{diagnostic} fashion: it characterises how shocks co-move
+in the historical sample and motivates the construction of joint stress
+scenarios, but it does not yet feed directly into the scenario generator of
+Chapter~\ref{ch:stress}.
+
+\section*{B.7 Conditional Tail Probabilities}
+
+Using the fitted copulas, the script
+\texttt{copula\_prob\_cond\_shocks.m} computes conditional probabilities of
+joint extreme events. In particular, interest centres on the probability that
+one shock exceeds a high quantile conditional on another shock being large:
+
+\begin{itemize}
+  \item the probability that the precautionary shock exceeds its 90th
+  percentile given that the aggregate-demand shock is above its 90th
+  percentile is found to be in the range of 35--45\%, consistent with strong
+  upper-tail dependence between the two;
+  \item in contrast, the probability that the precautionary shock is extreme
+  conditional on a large negative flow supply shock remains below 10\%,
+  reflecting the weaker and more symmetric dependence between supply and
+  precautionary disturbances.
+\end{itemize}
+
+These conditional tail probabilities highlight that extreme demand episodes are
+the most likely environment in which large precautionary shocks materialise,
+providing a structural rationale for focusing stress scenarios on joint demand
+and precautionary disturbances. A full integration of copula-based simulation
+into the scenario generator is left to future research and outlined in
+Chapter~\ref{ch:conclusions}.
+
+\section*{B.8 Additional VAR Diagnostic: Residual Distribution}
+
+Figure~\ref{fig:var-residuals-app} reports the histogram of standardised
+residuals for the WTI equation in the VAR(12), overlaid with a standard normal
+density. The heavy tails and mild asymmetry relative to the Gaussian benchmark
+are consistent with the evidence discussed in Appendix~A and motivate the use
+of bootstrap methods and heavy–tailed marginals in the copula analysis.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{fig_var_residuals.pdf} % usa lo stesso file che avevi
+    \caption{Standardised residuals of the WTI equation in the VAR(12) versus a standard normal density.}
+    \label{fig:var-residuals-app}
+\end{figure}
+
+
+\clearpage

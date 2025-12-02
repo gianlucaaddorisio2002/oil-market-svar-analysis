@@ -1,0 +1,291 @@
+\documentclass[11pt,a4paper,oneside]{report}
+
+% ====== Lingua e codifica ======
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{threeparttable}
+
+% ====== Tipografia e layout ======
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{
+  a4paper,
+  top=3.2cm,
+  bottom=3.0cm,
+  left=3.0cm,
+  right=3.0cm
+}
+
+\setlength{\headheight}{12pt}
+\setlength{\headsep}{8pt}
+
+% ====== Grafica e tabelle ======
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\definecolor{Header}{HTML}{4F81BD}
+\definecolor{RowLight}{HTML}{EEF3F9}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\sisetup{output-decimal-marker={,}}
+
+% ====== Header/Footer ======
+\usepackage{ragged2e}
+\usepackage{adjustbox}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash\hspace{0pt}}X} % X con sillabazione
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}      % p{..} leggibile
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+% ====== Link e metadata ======
+\usepackage{xcolor}
+\definecolor{linkblue}{HTML}{0A3D62}
+\usepackage[
+  colorlinks=true,
+  linkcolor=linkblue,
+  citecolor=linkblue,
+  urlcolor=linkblue,
+  pdfauthor={Gianluca Adriano Junior Addorisio},
+  pdftitle={Structural Identification of Oil Supply, Global Demand and Shocks: A Factor Analysis with Industrial Applications},
+  pdfsubject={Tesi di Laurea Triennale – Ingegneria Industriale}
+]{hyperref}
+
+% ====== Spaziatura ======
+\onehalfspacing
+
+% ====== Dati di comodo ======
+\newcommand{\Matricola}{Matr. N 15935}
+\newcommand{\Ateneo}{UNIVERSITÀ CAMPUS BIO-MEDICO DI ROMA}
+\newcommand{\Facolta}{FACOLTÀ DIPARTIMENTALE DI INGEGNERIA}
+\newcommand{\Corso}{CORSO DI LAUREA TRIENNALE IN\\[0.2cm] INGEGNERIA INDUSTRIALE}
+\newcommand{\Titolo}{Structural Identification of Oil Supply, Global Demand and Shocks:\\[0.2cm] A Factor Analysis with Industrial Applications} 
+\newcommand{\Relatore}{Ch.mo Dott. Marco Papi}
+\newcommand{\Laureando}{Gianluca Adriano Junior Addorisio}
+\newcommand{\Anno}{ANNO ACCADEMICO 2024/2025}
+
+\usepackage{csquotes}
+\usepackage{tikz}
+
+\usepackage[backend=biber,style=numeric]{biblatex}
+\addbibresource{bibliografia.bib}
+
+
+\DeclareCiteCommand{\cite}[\mkbibsuperscript]
+  {\usebibmacro{prenote}}
+  {%
+    \usebibmacro{citeindex}%
+    \printtext[bibhyperref]{%
+      \tikz[baseline=(n.base)]%
+        \node[draw,inner sep=1pt,rounded corners=2pt](n)%
+        {\scriptsize\textbf{\printfield{labelnumber}}};%
+    }%
+  }
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+
+% =========================================================
+%                       DOCUMENTO
+% =========================================================
+\begin{document}
+
+\begin{titlepage}
+
+  % ====== Matricola in alto a sinistra ======
+  \noindent{\fontsize{11}{13}\selectfont \Matricola}
+
+  % Linea orizzontale sottile in alto
+  \vspace{0.3cm}
+  \noindent\rule{\textwidth}{0.2pt}
+
+  \vspace{0.8cm}
+
+  \begin{center}
+
+    % ====== Logo ======
+    \includegraphics[width=4cm]{logo_campus.png}
+
+    \vspace{1cm}
+
+    % ====== Università ======
+    {\fontsize{16}{19}\selectfont \textbf{UNIVERSITÀ CAMPUS BIO-MEDICO DI ROMA}}
+
+    \vspace{0.8cm}
+
+    % ====== Facoltà e Corso ======
+    {\fontsize{13}{16}\selectfont \textbf{Facoltà Dipartimentale di Ingegneria}}\\[0.20cm]
+    {\fontsize{13}{16}\selectfont \textbf{Corso di Laurea in Ingegneria Industriale}}
+
+    \vspace{2cm}
+
+    % ====== Titolo (in inglese) ======
+    {\fontsize{18}{22}\selectfont\textbf{STRUCTURAL IDENTIFICATION OF OIL}}\\[0.25cm]
+    {\fontsize{18}{22}\selectfont\textbf{SUPPLY, GLOBAL DEMAND AND SHOCKS:}}\\[0.25cm]
+    {\fontsize{18}{22}\selectfont\textbf{A FACTOR ANALYSIS WITH INDUSTRIAL APPLICATIONS}}
+
+  \end{center}
+
+  \vspace{2.5cm}
+
+  % ====== Relatore a sinistra ======
+  \noindent
+  \begin{minipage}[t]{0.48\textwidth}
+    {\fontsize{13}{16}\selectfont \textbf{Relatore}}\\[0.15cm]
+    {\fontsize{13}{16}\selectfont \Relatore}
+  \end{minipage}%
+  \hfill
+  % ====== Laureando più in basso a destra ======
+  \begin{minipage}[t]{0.48\textwidth}
+    \raggedleft
+    \vspace{1.2cm} % <<-- QUI lo abbassi rispetto al Relatore
+    {\fontsize{13}{16}\selectfont \textbf{Laureando}}\\[0.15cm]
+    {\fontsize{13}{16}\selectfont \Laureando}
+  \end{minipage}
+
+  \vfill
+
+  % Linea orizzontale sottile in basso
+  \noindent\rule{\textwidth}{0.2pt}
+
+  \vspace{0.3cm}
+
+  \begin{center}
+    {\fontsize{13}{16}\selectfont \textbf{\Anno}}
+  \end{center}
+
+\end{titlepage}
+
+
+
+ \newpage
+  \thispagestyle{empty}
+ \null
+ \newpage
+% Dedica (opzionale)
+ \thispagestyle{empty}
+  \vspace*{2.4cm}
+ \begin{flushright}
+ \emph{To my parents}
+ \end{flushright}
+ \vspace*{\fill}
+ \clearpage
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+
+\clearpage
+\thispagestyle{empty}
+
+% ===== SOMMARIO (in italiano) =====
+\begin{center}
+  \textbf{Sommario}
+\end{center}
+
+Questa tesi analizza i meccanismi strutturali che guidano le oscillazioni del prezzo del petrolio e ne valuta le implicazioni per la gestione del rischio carburante nel settore del trasporto aereo.
+Viene costruito un dataset mensile 1990–2024 su produzione USA, attività economica OCSE, scorte petrolifere USA e prezzo reale del WTI, viene stimato un modello VAR a quattro variabili su trasformazioni stazionarie, evidenziando l’inadeguatezza delle regressioni statiche e la necessità di un approccio dinamico multivariato.
+
+Lo SVAR è identificato mediante restrizioni di segno in stile Kilian–Murphy, distinguendo shock di offerta, shock di domanda aggregata e shock precauzionali. Gli shock estratti presentano deviazioni marcate dalla normalità e forte dipendenza di coda, confermata tramite copule t. Le risposte agli impulsi mostrano che la domanda globale è il principale driver del prezzo del WTI nel medio periodo, mentre gli shock di offerta sono poco persistenti e quelli precauzionali diventano rilevanti soprattutto negli eventi estremi.
+
+Questi risultati alimentano la generazione di scenari di prezzo e un esercizio di stress test ispirato a una chiusura dello Stretto di Hormuz. La mappatura verso il prezzo del Jet Fuel e l’applicazione al caso ITA Airways indicano che una copertura lineare completa riduce sensibilmente l’esposizione ai picchi di prezzo determinati da shock di offerta estremi.
+
+\vspace{0.8cm}
+
+% ===== ABSTRACT (in inglese) =====
+\begin{center}
+  \textbf{Abstract}
+\end{center}
+
+This thesis investigates the structural drivers of crude oil price fluctuations and
+their implications for fuel-price risk management in energy-intensive
+industries.
+Using monthly data for 1990--2024, a four-variable VAR is estimated on
+stationary transformations of world oil production, OECD real activity,
+petroleum inventories and the real WTI price.
+Reduced-form evidence shows that static regressions are unstable and
+severely misspecified, motivating a dynamic multivariate approach. A
+structural VAR is then identified through sign restrictions in the spirit of
+Kilian and Murphy (2014), disentangling flow-supply, aggregate-demand and
+precautionary shocks.
+The structural shocks exhibit marked non-Gaussian features, strong
+leptokurtosis in demand and precautionary innovations, and significant tail
+dependence, captured through t-copulas.
+The estimated impulse responses imply that global demand is the dominant
+source of medium-run WTI variability, while supply shocks are short-lived and
+precautionary shocks contribute primarily through extreme events.
+These results feed into model-based scenario generation and a stress test
+calibrated on a Strait of Hormuz-type disruption. Mapping WTI paths into jet
+fuel prices, and applying them to the fuel bill of ITA Airways, shows that a
+full linear hedge substantially attenuates the cost impact of extreme
+supply disruptions.
+
+\clearpage
+
+
+
+\clearpage
+
+% Indice generale, elenco figure e tabelle
+\tableofcontents
+\clearpage
+% \listoffigures
+% \clearpage
+% \listoftables
+% \clearpage
+
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+\clearpage
+
+
+\pagenumbering{arabic}
+
+
+
+
+%\input{chapters/0_dispensa}
+\input{chapters/1_intro}
+\input{chapters/2_dati_metodi}
+\input{chapters/3_analisi}
+\input{chapters/4_results}
+\input{chapters/5_conclusions}
+
+\clearpage
+\printbibliography[heading=bibintoc,title={Bibliography}]
+
+% ---------------------------
+%        APPENDICI
+% ---------------------------
+\clearpage
+\appendix
+\input{appendix/appendixA}
+\input{appendix/appendixB}
+\input{appendix/ita_fuel}
+
+
+   % Ringraziamenti 
+    \chapter*{Ringraziamenti}
+    Desidero innanzitutto ringraziare il mio relatore, il \textit{Ch.mo} Dott.\ Marco Papi, per la disponibilità, la chiarezza delle indicazioni e il rigore metodologico con cui mi ha guidato nello sviluppo di questo lavoro. La possibilità di confrontarmi con lui sui temi dell’econometria dei mercati energetici e del risk management mi ha permesso di scoprire un interesse profondo per queste tematiche, che considero ormai centrale nelle mie prospettive di crescita accademica e professionale. Gli sono particolarmente grato non solo per l’opportunità di approfondire questi argomenti, che hanno contribuito a ridefinire l’orientamento delle mie scelte future, ma anche dal punto di vista personale: mi ha accolto in un momento difficile e mi ha aiutato, con discrezione e continuità, a ritrovare equilibrio e motivazione. A lui devo una parte essenziale di questo percorso.
+
+    Un ringraziamento va anche ai colleghi di corso con cui ho condiviso non solo esami e progetti, ma anche fatiche, preoccupazioni e soddisfazioni, e che hanno contribuito in modo significativo a chiarire concetti e a mettere alla prova le mie idee.
+
+    Infine, un ringraziamento particolare va alla mia famiglia, per il sostegno costante, la pazienza e la fiducia riposta in me lungo tutto il percorso universitario. La loro presenza silenziosa ma continua è stata la condizione che ha reso possibile questo traguardo.
+    
+    Ringrazio inoltre tutte le persone che non compaiono in questo elenco, ma che sanno di avere il mio affetto e che desidero sinceramente ringraziare per essermi state accanto.
+
+
+\end{document}

@@ -1,0 +1,296 @@
+\chapter{Stress Testing and Risk Engineering Application}
+\label{ch:stress}
+
+\section{Industrial Risk Exposure}
+
+Fuel price volatility represents one of the most significant sources of operational risk for transportation-intensive industries. Among all sectors, commercial aviation is structurally the most exposed: jet fuel typically accounts for 20--35\% of operating expenses, making airlines highly sensitive to oil market disturbances. Variations in the real price of WTI translate almost immediately into changes in jet-fuel costs, impacting cash flows, budget stability and short-term liquidity. This risk is inherently systemic, as it is driven by global supply and demand forces, inventory behaviour and geopolitical tensions.
+
+From an engineering perspective, hedging denotes a set of quantitative tools designed to reduce the variance of a firm’s cost structure when exposed to volatile external inputs. The goal is not to predict prices or maximise profit, but to reduce uncertainty and stabilise operational planning. For airlines, hedging fuel costs therefore constitutes a risk engineering problem: the task is to mitigate exposure to structural shocks in oil markets in a way that aligns with operational constraints, regulatory requirements and financial limits.
+
+\subsection{Aviation-Specific Vulnerability}
+
+The aviation sector is uniquely exposed because its core input (jet fuel) is directly tied to crude oil markets, which exhibit strong nonlinear responses to shocks. Flow supply disruptions, global demand expansions and precautionary inventory behaviour all generate distinct price patterns, as shown in Chapter~\ref{ch:empirical}. Airlines cannot store large quantities of fuel nor easily substitute it, and the fleet utilisation model (high-frequency operations, seasonal variability, hub scheduling) makes cost predictability essential.
+
+ITA Airways, like most European carriers, displays a marked seasonal pattern in flight operations, with strong peaks during the summer months and troughs in winter. This directly translates into a seasonal pattern of monthly fuel consumption. Based on a conservative engineering analysis of flight operations, fleet utilisation and historical seasonality patterns, the annual jet-fuel consumption for 2023 is estimated at approximately $3.5$ million barrels (medium scenario), with plausible bounds ranging from $3.2$ to $4.0$ million barrels.\footnote{A transparent, scenario-based reconstruction of ITA Airways' 2023 jet-fuel consumption---including operational data, fleet composition, fuel-burn benchmarks and cross-checks against comparable European carriers---is documented in Appendix~\ref{app:ita_fuel}. The appendix summarises the same methodology presented in the internal technical report ``Stima Conservativa del Consumo Carburante Annuale di ITA Airways (2023)'', 2024.}
+
+\section{Scenario Construction (SVAR-Based)}
+\label{sec:scenario}
+
+Using the SVAR identification framework developed in Chapter~\ref{ch:empirical}, and following standard oil-market VAR practice \cite{Kilian2009,KilianMurphy2014,BaumeisterHamilton2019}, structural shocks can be mapped into real WTI price trajectories. The \textsc{MATLAB} script \texttt{stress\_test\_hormuz\_VAR.m} produces three benchmark scenarios, saved in \texttt{stress\_hormuz\_VAR\_results.mat}:
+
+\begin{itemize}
+    \item \texttt{P\_baseline\_USD}: VAR median projection with no structural disturbance.
+    \item \texttt{P\_supply\_USD}: WTI trajectory under a large negative supply shock (Hormuz-type).
+    \item \texttt{P\_demand\_USD}: WTI trajectory under a large positive aggregate demand shock.
+\end{itemize}
+
+Table~\ref{tab:wti-scenarios} summarises the implied WTI levels over the first year under each scenario.
+
+\begin{table}[H]
+\centering
+\caption{WTI price levels under baseline, supply-shock and demand-shock scenarios (first 12 months).}
+\label{tab:wti-scenarios}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Month} & \textbf{Baseline} & \textbf{Supply Shock} & \textbf{Demand Shock} \\
+\midrule
+Jan & 60.0 & 60.0 & 60.0 \\ 
+Feb & 60.0 & 72.2 & 62.6 \\ 
+Mar & 60.0 & 93.9 & 63.4 \\ 
+Apr & 60.0 & 82.0 & 63.7 \\ 
+May & 60.0 & 76.9 & 63.1 \\ 
+Jun & 60.0 & 77.8 & 62.9 \\ 
+Jul & 60.0 & 72.5 & 62.6 \\ 
+Aug & 60.0 & 78.0 & 62.3 \\ 
+Sep & 60.0 & 84.1 & 61.8 \\ 
+Oct & 60.0 & 75.6 & 61.2 \\ 
+Nov & 60.0 & 95.2 & 62.0 \\ 
+Dec & 60.0 & 98.6 & 62.9 \\ 
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\footnotesize\textit{Note}: Values rounded to one decimal place. \normalsize
+
+\subsection{From Structural Shocks to Price Paths}
+
+Let $\theta_{h}^{(j)}$ denote the impulse response of real WTI at horizon $h$ to shock $j \in \{s,d,p\}$. For a shock of magnitude $\varepsilon_j$, the corresponding WTI path is
+\[
+\Delta \text{WTI}^{\text{real}}_{t+h}
+= \varepsilon_j \cdot \theta_{h}^{(j)}.
+\]
+
+The \textsc{MATLAB} script \texttt{extract\_wti\_irf\_from\_var.m} implements this mapping,
+converting structural disturbances into trajectories for the real WTI price. For the risk-engineering application, these real-price paths are interpreted as constant-(2024)-dollar WTI prices; all scenario figures are therefore reported in real USD per barrel, abstracting from residual discrepancies between deflated and nominal series. A concise description of the script structure and its role in the stress-testing pipeline is provided in Appendix~C.
+
+\subsection{Baseline Scenario}
+
+The baseline path (\texttt{P\_baseline\_USD}) follows the median projection of the VAR and reflects a neutral environment without structural shocks. It captures the intrinsic persistence and autocorrelation structure of the oil market.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1.0\textwidth]{montecarlo.png}
+\caption{Monte Carlo VAR baseline forecast of the real WTI price. The solid line reports the median projection and the shaded area the 10--90\% prediction band around the initial price level.}
+\label{fig:wti-baseline-mc}
+\end{figure}
+
+\subsection{Hormuz Supply Shock Scenario}
+
+The Hormuz-type shock is modelled as a very large negative flow supply disturbance corresponding to roughly eleven standard deviations of the estimated supply shock distribution. The shock magnitude is calibrated so that the real WTI price in the stress scenario rises to slightly more than twice the baseline level after one year (an increase of about 100--110\%), consistent with an extreme disruption of exports through the Strait of Hormuz \parencite{Kilian2009,BaumeisterHamilton2019}. The scenario \texttt{P\_supply\_USD} exhibits:
+
+\begin{itemize}
+    \item an immediate and pronounced jump in WTI relative to the baseline path;
+    \item a cumulative increase in the real WTI price of around 100\% at the 12-month horizon;
+    \item gradual mean reversion over the subsequent months, with prices remaining substantially above the baseline throughout the 24-month stress-test window.
+\end{itemize}
+
+\subsection{Demand-Driven Spike Scenario}
+
+The demand-shock scenario (\texttt{P\_demand\_USD}) corresponds to a two-standard-deviation aggregate demand expansion. This generates:
+
+\begin{itemize}
+    \item a gradual increase in WTI;
+    \item persistent effects lasting up to 18 months;
+    \item higher long-run price levels relative to supply-driven shocks.
+\end{itemize}
+
+Demand-driven scenarios typically reflect global economic expansions, rising industrial output and increased mobility demand.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1.0\textwidth]{figura42.png}
+\caption{Real WTI price trajectories under baseline, supply-shock and demand-shock scenarios. The dashed line reports the baseline path, while the solid lines correspond to the calibrated Hormuz-type supply shock and the strong aggregate demand shock.}
+\label{fig:wti-scenarios}
+\end{figure}
+
+\section{Mapping WTI to Jet-Fuel Costs}
+\label{sec:jetfuel}
+
+\subsection{Pass-Through Model}
+
+The link between crude oil prices and jet fuel is approximated using the regression estimated in \texttt{estimate\_pass\_through\_jetfuel.m} on monthly Jet Fuel USGC spot prices from the U.S.\ Energy Information Administration \cite{JetFuel_EIA}. Starting from a log--log specification, the pass-through is linearised around a benchmark WTI level of 60 USD/bbl:
+\[
+\widehat{JF}_t
+= \alpha_{\text{lin}} + \beta_{\text{lin}} \cdot WTI_t,
+\]
+where $JF_t$ denotes the Jet Fuel USGC spot price. The pass-through coefficient $\beta_{\text{lin}}$ captures the proportion of crude price changes transmitted to jet fuel in a local neighbourhood of the calibration point.
+
+\begin{table}[H]
+\centering
+\caption{Linear pass-through regression of Jet Fuel USGC prices on WTI.}
+\label{tab:passthrough}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lc}
+\toprule
+\textbf{Coefficient} & \textbf{Estimate} \\
+\midrule
+$\alpha_{\text{lin}}$ & -27.7001 \\
+$\beta_{\text{lin}}$  & 3.6532   \\
+$R^{2}$               & 0.790    \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.9em}
+{\footnotesize
+\begin{minipage}{0.85\linewidth}
+\textit{Note}: $\alpha_{\text{lin}}$ and $\beta_{\text{lin}}$ are obtained by linearising 
+the log--log pass-through equation at WTI = 60 USD/bbl.  
+Standard errors are not reported because the linearised coefficients are analytically derived rather than directly estimated. The resulting relation should be interpreted as a local approximation rather than a full structural pricing model.
+\end{minipage}
+}
+\end{table}
+
+\subsection{Validation}
+
+Residual diagnostics confirm:
+
+\begin{itemize}
+    \item limited autocorrelation;
+    \item no severe heteroscedasticity;
+    \item a reasonable in-sample fit for a simple linear approximation.
+\end{itemize}
+
+A scatter plot of observed vs.\ fitted jet fuel prices is shown in Figure~\ref{fig:pass-through}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{fig_pass_through_scatter.png}
+\caption{Observed vs.\ fitted Jet Fuel USGC prices via linear pass-through.}
+\label{fig:pass-through}
+\end{figure}
+
+\subsection{Scenario Mapping}
+
+For each WTI scenario $\text{WTI}^{(k)}_{t+h}$, the corresponding jet-fuel price path is:
+\[
+JF^{(k)}_{t+h}
+= \alpha_{\text{lin}} + \beta_{\text{lin}} \cdot \text{WTI}^{(k)}_{t+h}.
+\]
+These jet-fuel paths form the basis for computing monthly and annual operating costs under different environments.
+
+\section{Risk Scenarios}
+\label{sec:riskscen}
+
+\subsection{Monthly Fuel Consumption Allocation}
+
+Following Eurocontrol seasonal flight patterns and the technical analysis of ITA Airways' 2023 operations, annual fuel consumption ($C_{\text{annual}}$) is distributed across months using the following weights:
+\[
+w = 
+(0.06, 0.06, 0.08, 0.085, 0.09, 0.095, 0.105, 0.105, 0.09, 0.085, 0.07, 0.08),
+\]
+which sum to 1. Monthly consumption is therefore modelled deterministically as
+\[
+C_m = w_m \cdot C_{\text{annual}}.
+\]
+Table~\ref{tab:weights} reports the full set of seasonal weights used in the stress tests.
+
+\begin{table}[H]
+\centering
+\caption{Seasonal allocation weights for monthly jet-fuel consumption.}
+\label{tab:weights}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccccccccccc}
+\toprule
+\textbf{Month}  & Jan  & Feb  & Mar  & Apr   & May  & Jun   & Jul   & Aug   & Sep  & Oct   & Nov  & Dec  \\
+\midrule
+\textbf{Weight} & 0.06 & 0.06 & 0.08 & 0.085 & 0.09 & 0.095 & 0.105 & 0.105 & 0.09 & 0.085 & 0.07 & 0.08 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Baseline Scenario}
+
+The baseline cost is:
+\[
+\text{Cost}_{m}^{\text{baseline}}
+= C_m \cdot JF^{(\text{baseline})}_{m}.
+\]
+
+\subsection{Supply-Shock Scenario}
+
+The Hormuz supply shock increases jet-fuel prices immediately and sharply:
+\[
+\text{Cost}_{m}^{\text{supply}}
+= C_m \cdot JF^{(\text{supply})}_{m}.
+\]
+
+\subsection{Demand-Shock Scenario}
+
+The demand shock results in a more persistent cost increase:
+\[
+\text{Cost}_{m}^{\text{demand}}
+= C_m \cdot JF^{(\text{demand})}_{m}.
+\]
+
+\begin{table}[H]
+\centering
+\caption{Annual fuel cost under baseline, supply-shock and demand-shock scenarios.}
+\label{tab:cost-scenarios}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Scenario} & \textbf{Annual Cost (USD)} & \textbf{Deviation from Baseline} & \textbf{Percent Change} \\
+\midrule
+Baseline     & 700.00\,mln & 0            & 0\%   \\
+Supply Shock & 974.48\,mln & 274.48\,mln  & 39.2\% \\
+Demand Shock & 731.82\,mln & 31.82\,mln   & 4.5\%  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=1\textwidth]{braccio.png}
+\caption{Jet fuel price and ITA Airways fuel cost under a Hormuz-type supply shock. 
+The upper panel reports the Jet Fuel path under the calibrated supply shock (baseline vs.\ stress scenario);
+the lower panel shows the corresponding monthly fuel cost with and without a 100\% linear hedge.}
+\label{fig:cost-scenarios}
+\end{figure}
+
+\section{Hedging Strategies}
+\label{sec:hedging}
+
+\subsection{Futures Contracts}
+
+A standard futures hedge fixes the purchase price:
+\[
+\text{Hedged Cost}^{F}_m
+= C_m \cdot F,
+\]
+where $F$ is the futures price. The variance of fuel cost decreases, while the expected cost may rise or fall depending on market conditions.
+
+\subsection{Swaps}
+
+A fixed-for-floating swap ensures:
+\[
+\text{Hedged Cost}^{S}_m
+= C_m \cdot S_{\text{fixed}},
+\]
+independent of jet-fuel spot prices. Swaps provide full linear protection but require credit support.
+
+\subsection{Collars}
+
+A zero-cost collar defines upper and lower bounds:
+\begin{itemize}
+    \item floor price: $P_{\min}$ via selling a put;
+    \item cap price: $P_{\max}$ via buying a call.
+\end{itemize}
+This yields asymmetric protection at zero initial cost, at the expense of giving up part of the upside if prices fall.
+
+\section{Impact Analysis}
+\label{sec:impact}
+
+\subsection{Cost Reduction}
+
+In the three benchmark scenarios, a full linear hedge transforms the fuel-cost profile from one that closely tracks spot jet-fuel prices to one that is nearly flat across months. In the Hormuz supply-shock case, the hedge prevents the large temporary spike in fuel expenditure, keeping the annual fuel bill close to the baseline level despite the underlying price shock. In the more moderate demand-shock scenario, the hedge likewise dampens the cumulative cost increase, at the expense of foregoing potential savings in states where prices would have fallen below the locked-in level.
+
+\subsection{Engineering Decision Implications}
+
+Within this stylised setup, the results imply that fuel hedging:
+\begin{itemize}
+    \item can stabilise operational fuel budgets in the presence of large oil-market shocks;
+    \item reduces exposure to adverse price scenarios such as a Hormuz-type supply disruption;
+    \item can support more reliable capacity and pricing decisions, even though these operational links are not modelled explicitly in this thesis;
+    \item improves the robustness of medium-term financial planning under extreme but plausible stress scenarios.
+\end{itemize}

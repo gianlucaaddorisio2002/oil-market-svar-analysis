@@ -1,0 +1,229 @@
+\chapter{Data and Econometric Methodology}
+\label{chap:data_methods}
+
+This chapter presents the data, the econometric transformations,
+and the methodology used for the estimation of the VAR model and the structural
+identification discussed in Chapter~1.
+
+Chapter~1 has clearly shown that:
+\begin{itemize}
+    \item the static OLS model fails to capture the dynamics of the oil price;
+    \item the relationships between variables change significantly across time subintervals;
+    \item the residuals of static models exhibit autocorrelation, heteroscedasticity, and heavy tails;
+    \item market dynamics are \emph{regime-dependent}, requiring a multivariate and dynamic approach.
+\end{itemize}
+
+In light of this evidence, the objective of this chapter is to construct a coherent,
+stationary dataset suitable for estimating a structural VAR model, following the
+established methodology in the literature by Kilian (2009) and Kilian \& Murphy (2014). 
+
+
+\section{Data and Variable Construction}
+% ------------------------------------------------------------------------
+
+The time series used come from recognized institutional sources that are widely employed in the econometric literature on energy markets, ensuring reliability, replicability, and methodological consistency. The selection of variables follows the established approach of structural models (VAR and SVAR) applied to the study of oil shocks, as in \textcite{Kilian2009} and \textcite{KilianMurphy2014}.
+
+\subsection{Data Sources}
+
+\begin{itemize}
+    
+    \item \textbf{WTI (West Texas Intermediate):} spot price of U.S. crude oil expressed in dollars per barrel (USD/bbl) and commonly used as a benchmark for analysis of the North American oil market.
+    The series is provided at daily frequency and was converted to monthly frequency using the arithmetic mean \cite{FRED_DCOILWTICO_2025}.
+
+    \item \textbf{World oil production:} global crude oil output, measured in millions of barrels per day (mb/d). The series is already available at monthly frequency and is widely used as a proxy for global supply \cite{EIA_GlobalOilProduction_2025}.
+
+    \item \textbf{Crude oil inventories:} physical stocks of oil stored at the Cushing (Oklahoma) hub, considered a proxy for U.S. commercial stocks.
+    The series is expressed in thousands of barrels and is originally weekly; to obtain a monthly frequency, the last available value of each month was selected, since the variable represents a stock rather than a flow \cite{FRED_WCESTUS1_2025}.
+
+    \item \textbf{Global Real Economic Activity (REA):} unit-free index constructed on the basis of dry bulk shipping rates.
+    The measure is a proxy for global commodity demand and follows the methodology introduced by Kilian (2009), widely adopted in the oil shock literature \cite{DallasFed_iGREA_2025}.\footnote{The index reflects changes in bulk shipping freight rates, under the assumption that an increase in transportation costs is associated with an increase in demand for industrial inputs and therefore in global economic activity.}
+
+    \item \textbf{CPI (Consumer Price Index):} U.S. consumer price index (base 1982--1984 = 100), used to deflate the nominal oil price and obtain the real price. The series is directly available at monthly frequency \cite{FRED_CPIAUCSL_2025}.
+
+\end{itemize}
+
+\subsection{Rationale for Variable Selection}
+
+The choice of data and variables reflects a conscious compromise between adherence to the literature and contextual consistency with the empirical environment under analysis. In particular, the use of WTI as a benchmark requires a brief methodological justification. \textit{Kilian and Zhou (2020)} \cite{KilianZhou2020} note that WTI may not accurately represent the global crude oil price because of logistical dynamics specific to the U.S. market, suggesting \emph{Brent} instead as a more internationally representative measure.
+
+In the present study, however, all variables used (inventories, CPI, data structure, macroeconomic indicators) refer to the U.S. context. For this reason, a robustness check was conducted by replacing WTI with Brent and replicating the entire diagnostic and modeling process. The results showed weaker performance in terms of statistical properties (greater residual autocorrelation, lower global statistical significance) and did not provide additional interpretative benefits. 
+
+In light of this empirical evidence, WTI proves to be the choice most consistent with the analytical perimeter and the objective of this study. A summary of the robustness analysis is reported in Appendix~A (ask the supervisor whether to include this).
+
+\vspace{6pt}
+
+All series were temporally realigned by intersecting common dates and converted into natural logarithms. Where necessary, differencing was applied to ensure stationarity, in line with standard methodological practices in the relevant literature (Kilian (2009) \cite{Kilian2009}; Kilian and Murphy (2014) \cite{KilianMurphy2014}).
+
+\subsection{Variable Construction}
+
+Following the reference literature, the variables used in the model were transformed as follows:
+
+\begin{itemize}
+    \item \textbf{Real oil price}:
+    \[
+    WTI^{real}_t = \frac{WTI^{nom}_t}{CPI_t} \times 100.
+    \]
+    
+    \item \textbf{Production} 
+    (\textit{Production}):
+    \[
+    \Delta \log(\text{Production}_t).
+    \]
+    
+    \item \textbf{Inventories} 
+    (\textit{Inventories}):
+    \[
+    \Delta \log(\text{Inventories}_t).
+    \]
+    
+    \item \textbf{Global economic activity} 
+    (\textit{REA}):
+    \[
+    \Delta \log(\text{REA}_t).
+    \]
+\end{itemize}
+
+These transformations are motivated both by econometric considerations
+(stationarity, interpretability of coefficients) and by the results obtained in Chapter~1:
+the series in levels generate residuals with autocorrelation and non-constant variance,
+whereas log differences mitigate these issues and allow for a more stable representation of the dynamics.
+
+% ------------------------------------------------------------------------
+\section{Data Preprocessing}
+% ------------------------------------------------------------------------
+
+\subsection{Preliminary Transformations}
+
+The preliminary transformations include:
+\begin{itemize}
+    \item log transformation of the series in levels;
+    \item log differencing to obtain monthly growth rates;
+    \item deflation of WTI by CPI;
+    \item harmonization of date format (ISO–8601) and ascending ordering;
+    \item removal of possible outliers or duplicate dates.
+\end{itemize}
+
+The transformations were implemented in \texttt{MATLAB} through dedicated scripts;
+see ``\texttt{build\_oil\_dataset.m}''.
+
+\subsection{Stationarity Tests}
+
+All transformed series were subjected to ADF (Augmented Dickey–Fuller) tests.
+The results show:
+
+\begin{itemize}
+    \item systematic non-stationarity of the series in levels (price, production, REA, inventories);
+    \item full stationarity of log differences (p-value $\approx$ 1.000).
+\end{itemize}
+
+This evidence is consistent with the literature \cite{BaumeisterKilian2016} and with the \emph{unit-root} nature that is typical of oil series.
+It also confirms what emerged in Chapter~1: a static model based on variables in levels
+produces non-white residuals and leads to unreliable inference.
+
+\subsection{Descriptive Statistics}
+
+For each variable, the mean, standard deviation, skewness, and kurtosis were computed.
+The distributions display heavy tails, as expected for energy series,
+and further confirm the inadequacy of the normality assumption for residuals in static models.
+
+% ------------------------------------------------------------------------
+\section{Econometric Model Specification}
+% ------------------------------------------------------------------------
+
+\subsection{The VAR(p) Model}
+
+The VAR(p) model used has the form:
+\[
+y_t = A_1 y_{t-1} + \dots + A_p y_{t-p} + u_t,
+\]
+where $u_t$ is a vector of reduced-form shocks that are not autocorrelated over time.
+
+The endogenous vector $y_t$ includes, in the order also used for Cholesky identification:
+
+\begin{enumerate}
+    \item $\Delta \text{Production}_t$ (supply shocks),
+    \item $\Delta \text{REA}_t$ (global demand shocks),
+    \item $\Delta \text{Inventories}_t$ (precautionary shocks),
+    \item $\Delta \text{WTI}^{real}_t$ (real oil price).
+\end{enumerate}
+
+The ordering reflects the economic structure described in Chapter~1:
+production adjusts slowly, the price reacts instantaneously,
+inventories capture storage demand, and REA represents global demand.
+
+
+\subsection{Lag Length Selection}
+The choice of the number of lags $p$ was not made via the traditional
+information criteria (AIC, BIC, HQ). As discussed by \textcite{KilianZhou2020}, these criteria tend to select
+values of $p$ that are too low in VAR models applied to the oil market, leading to
+underspecified models and autocorrelated residuals. For this reason, relying on
+AIC/BIC does not guarantee sufficiently rich dynamics to capture the true structure
+of the interactions between production, demand, inventories, and price.
+
+Consequently, an \textbf{empirical iterative} approach was adopted: VAR models
+with $p = 1, 2, \dots, 12$ were estimated, and for each of them the following
+two criteria, considered fundamental in the literature \cite{hamilton1994}, were evaluated:
+
+\begin{itemize}
+    \item \textbf{dynamic stability of the system}, verified by checking that all eigenvalues
+    of the characteristic polynomial lie within the unit circle;
+
+    \item \textbf{absence of serial autocorrelation in the residuals}, assessed through Ljung--Box
+    tests over multiple horizons and ACF/PACF analysis.
+\end{itemize}
+
+The selected number of lags is the \emph{first} value of $p$ that
+\emph{simultaneously} satisfies both conditions. This value turns out to be $p = 7$ \footnote{Kilian (2009) uses a monthly VAR(24) to model oil market dynamics
+(p. 8 \cite{Kilian2009}), reflecting the need to include a sufficiently long memory to avoid
+residual autocorrelation in the reduced-form equations. This requirement is consistent with the evidence reported by
+\textcite{BarskyKilian2002}, according to which the adjustment of supply and demand in the oil market
+takes place gradually and with strong persistence (pp.~127, 130), calling for dynamic models with an
+adequate number of lags.}
+, in line with
+the specifications used in the main empirical studies on oil market dynamics.
+
+
+% ------------------------------------------------------------------------
+\section{Structural Identification Strategy}
+% ------------------------------------------------------------------------
+
+\subsection{Cholesky Identification}
+
+A first structural identification is obtained through Cholesky decomposition of the VAR residual covariance matrix.
+This procedure yields orthogonal shocks that serve as a benchmark.
+
+\subsection{Sign-Restriction Identification}
+
+Subsequently, economically motivated sign restrictions are imposed,
+following \textcite{KilianMurphy2014}.
+The restrictions include:
+\begin{itemize}
+    \item near-zero short-run supply elasticity;
+    \item positive price response to a global demand shock;
+    \item precautionary shock that increases inventories and price;
+    \item no contemporaneous response of production to the price.
+\end{itemize}
+\noindent
+These restrictions allow us to distinguish:
+\begin{itemize}
+    \item supply shocks,
+    \item aggregate demand shocks,
+    \item precautionary demand shocks.
+\end{itemize}
+
+% ------------------------------------------------------------------------
+\section{Model Diagnostics}
+% ------------------------------------------------------------------------
+
+On the basis of the final VAR(7) model, the following checks were carried out:
+
+\begin{itemize}
+    \item \textbf{Dynamic stability:} all eigenvalues lie within the unit circle.
+    \item \textbf{Residual autocorrelation:} Ljung–Box tests do not reject the null hypothesis.
+    \item \textbf{Heteroscedasticity:} Breusch–Pagan test is significant (LM = 11.50, \emph{p} = 0.0093); robust standard errors are adopted.
+    \item \textbf{Normality:} Jarque–Bera rejects normality (as is typical),
+          but the IRFs are robust to deviations from Gaussianity.
+\end{itemize}
+
+These results confirm that the VAR is well specified and represents a clear improvement
+over the static OLS model discussed in Chapter~1.

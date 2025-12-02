@@ -1,0 +1,113 @@
+\chapter{Conclusions}
+\label{ch:conclusions}
+
+This thesis developed a comprehensive econometric and engineering framework for analysing oil market dynamics and assessing fuel price risk for aviation. The approach integrated structural macroeconomic modelling, nonlinear dependence analysis and scenario-based stress testing, culminating in an applied hedging case study for ITA Airways. The methodology combined VAR/SVAR identification, copula theory and engineering risk evaluation, with all empirical components implemented through reproducible \textsc{MATLAB} procedures.
+
+\section{Summary of Findings}
+
+The empirical results confirm the fundamental role of structural shocks in shaping oil price behaviour. Using a VAR(12) estimated on real WTI prices, U.S.\ crude oil production, OECD industrial activity and inventories, and identifying shocks via sign and elasticity restrictions, the analysis recovered flow supply, aggregate demand and precautionary demand disturbances consistent with the literature \parencite{Kilian2009, KilianMurphy2014, BaumeisterHamilton2019}.
+
+Impulse responses revealed that:
+\begin{itemize}
+    \item supply shocks have strong but short-lived effects on oil prices;
+    \item aggregate demand shocks generate persistent increases in prices and production;
+    \item precautionary shocks produce sharp and immediate reactions, reflecting expectations of future scarcity.
+\end{itemize}
+
+The forecast error variance decomposition confirmed that medium-run price variability is dominated by demand shocks, whereas short-run volatility is closely linked to precautionary behaviour. Historical decompositions reproduced major episodes of oil price instability, including the 2003--2008 boom, the 2008 collapse and the 2014 shale-related decline.
+
+Beyond marginal behaviour, the dependence structure of shocks was examined using copula models. Strong asymmetric tail dependence between aggregate and precautionary shocks was observed, highlighting the importance of nonlinear interactions during episodes of heightened uncertainty. These results \emph{motivate} the construction of stress scenarios that consider joint extreme realisations of structural shocks, even though the copula estimates are used in a primarily diagnostic rather than generative fashion.
+
+The stress-testing module translated structural disturbances into WTI price paths using the identified impulse responses. Three benchmark scenarios were constructed: a baseline environment, a severe supply disruption reflecting a Hormuz-type event, and a demand-driven price spike. These were then mapped into jet fuel price trajectories using a simple log--log pass-through specification, locally linearised around a benchmark WTI price.
+
+Monthly fuel costs for ITA Airways were computed by integrating these price paths with a deterministic, seasonally adjusted fuel consumption profile based on Eurocontrol traffic patterns and internal engineering estimates. The results showed that both supply and demand disturbances can generate substantial increases in monthly and annual fuel expenditure, with the Hormuz scenario producing the largest short-run impact and demand shocks generating more persistent cost pressure.
+
+Finally, the hedging analysis evaluated three risk mitigation instruments --- futures, swaps and collars --- using monthly fuel consumption and scenario-based jet-fuel prices. Within the stylised three-scenario setup, all instruments flattened the fuel-cost profile relative to the unhedged case: swaps delivered the strongest smoothing of scenario-to-scenario differences, while collars provided asymmetric protection against upside price spikes at the expense of forfeiting some downside gains. These findings illustrate the potential engineering value of financial hedging as a means of stabilising operational budgets and mitigating exposure to structural oil market risk under extreme but plausible scenarios.
+
+\section{Implications}
+
+The results carry several implications for firms operating in fuel-intensive sectors:
+
+\begin{itemize}
+    \item \textbf{Structural understanding matters:} distinguishing between supply, aggregate demand and precautionary shocks is critical for designing robust hedging strategies and avoiding misinterpretation of market signals.
+    \item \textbf{Demand shocks dominate long-run price behaviour:} firms should place significant weight on macroeconomic indicators when evaluating medium-term exposure.
+    \item \textbf{Precautionary shocks represent a key short-run risk driver:} geopolitical uncertainty and expectation-driven behaviour can produce sharp cost spikes even without physical supply losses.
+    \item \textbf{Hedging can improve budget stability:} even in this simplified setting, more stable fuel-cost profiles can facilitate engineering decisions related to fleet planning, capacity scheduling and ticket pricing, although these operational links are not modelled explicitly in this thesis.
+\end{itemize}
+
+For policymakers and regulators, the framework demonstrates how structural modelling can support risk assessment in sectors reliant on energy commodities, and highlights the importance of transparent, timely data on production, inventories and industrial activity. These implications should, however, be interpreted in light of the modelling simplifications discussed in Section~\ref{sec:limitations}.
+
+\section{Limitations}
+\label{sec:limitations}
+
+The empirical analysis highlights several methodological and structural limitations that constrain the interpretation of the results and suggest caution when extrapolating beyond the scope of the thesis.
+
+\begin{itemize}
+
+    \item \textbf{Reduced-form restrictions and limited explanatory power.}  
+    Although the VAR(12) successfully removes residual autocorrelation, it explains only a modest share of the variance of the real WTI price. The model captures dynamic co-movements but has limited predictive ability for the price level, as shown by the weak in-sample fit and the large role of unexplained residual shocks.
+
+    \item \textbf{Heavy-tailed residuals and non-Gaussian structural shocks.}  
+    Both reduced-form residuals and structurally identified shocks exhibit pronounced excess kurtosis and asymmetric tail behaviour. Assuming approximate normality in the bootstrap-based scenario generation therefore underestimates extreme risks, despite the use of copulas to characterise dependence.
+
+    \item \textbf{Parameter constancy and potential structural instability.}  
+    Rolling-window OLS results and historical episodes such as the shale revolution indicate that oil-market elasticities may vary over time. The constant-parameter VAR/SVAR framework may therefore mask regime changes in the propagation of supply, demand and precautionary shocks.
+
+    \item \textbf{Linearity of the propagation mechanism.}  
+    The VAR imposes linear dynamics, whereas the copula analysis reveals strong state-dependent tail dependence, particularly between demand and precautionary shocks. Such nonlinearities are not captured by the current specification.
+
+    \item \textbf{Simplified pass-through from WTI to Jet Fuel.}  
+    The pass-through model is based on a single log--log relation, locally linearised around one price point, and ignores crack-spread dynamics, refinery bottlenecks and potential asymmetries in Jet Fuel pricing. This introduces model risk when mapping WTI scenarios to fuel costs.
+
+    \item \textbf{Absence of basis risk and market constraints in the hedging exercise.}  
+    The hedging application assumes a perfect hedge with no WTI--Jet Fuel basis risk, no margin requirements, no forward-curve structure and no foreign-exchange risk. These assumptions make the results mechanically optimistic relative to realistic trading conditions.
+
+    \item \textbf{Deterministic fuel consumption and limited operational detail.}  
+    Monthly Jet Fuel use follows a deterministic and highly stylised seasonal profile. Real-world airline operations exhibit substantial variability due to seasonality, load factors, aircraft mix and route structure, none of which is captured by the model; stochastic volume risk is therefore ignored.
+
+    \item \textbf{Reduced-form Monte Carlo simulation.}  
+    Scenario generation relies on bootstrap sampling of VAR residuals, which preserves reduced-form dynamics but not the structural dependence patterns among shocks. As a result, structural tail dependence may be only partially reflected in simulated extremes.
+
+\end{itemize}
+
+These limitations do not undermine the qualitative insights of the analysis but restrict the generality of the quantitative results and motivate the extensions discussed in the following section.
+
+\section{Future Research Directions}
+
+The limitations discussed above naturally point to several directions for future research aimed at improving the statistical realism, structural interpretability and practical relevance of oil-market risk assessment.
+
+\begin{itemize}
+
+    \item \textbf{Time-varying parameter SVARs with stochastic volatility.}  
+    The evidence of structural instability and evolving elasticities suggests moving toward TVP-SVAR or Bayesian stochastic-volatility frameworks, allowing the propagation of supply, demand and precautionary shocks to drift across regimes such as the shale revolution or crisis periods.
+
+    \item \textbf{Volatility modelling with higher-frequency data.}  
+    Given the heavy-tailed residuals and volatility clustering, future work could estimate GARCH-type or stochastic-volatility models using weekly or daily data, integrating them either as stand-alone components or as volatility inputs to a multivariate model.
+
+    \item \textbf{Nonlinear and regime-dependent VAR structures.}  
+    The tail dependence detected between demand and precautionary shocks motivates nonlinear specifications: threshold VARs, Markov-switching VARs or smooth-transition VARs capable of capturing state-dependent propagation under extreme market conditions.
+
+    \item \textbf{Hybrid deep-learning forecasting models.}  
+    Since the VAR explains only a limited share of price-level variability, deep-learning sequence models such as LSTM or transformer architectures could complement the structural model. A hybrid pipeline---GARCH/SV for volatility, LSTM for nonlinear interactions, SVAR for structural interpretation---may yield richer scenario generation.
+
+    \item \textbf{Dynamic and higher-dimensional copula models.}  
+    Extending the copula analysis to dynamic copulas or vine copulas would allow dependence among structural shocks to evolve over time, strengthening the realism of structural scenario simulation and tail-risk quantification.
+
+    \item \textbf{More realistic pass-through and basis-risk modelling.}  
+    Future work could model crack-spread dynamics, refinery capacity constraints and Jet Fuel--WTI basis risk explicitly, replacing the current linear pass-through with a structural or semi-parametric pricing relation.
+
+    \item \textbf{Stochastic and operationally detailed fuel-consumption modelling.}  
+    Incorporating route-level data, aircraft utilisation, seasonal load factors and stochastic volume uncertainty would provide a more granular mapping from oil-market shocks to airline operating costs.
+
+    \item \textbf{Advanced hedging optimisation under market constraints.}  
+    A rigorous extension would integrate FX risk, margin requirements, forward-curve structure, liquidity constraints and partial-hedge strategies within a stochastic programming or risk-budgeting framework.
+    
+\end{itemize}
+
+Overall, these extensions would allow future research to bridge the gap between structural macro--oil modelling and practical risk engineering, especially in applications involving extreme-event stress testing and airline fuel-cost management.
+
+\section{Final Remarks}
+
+This thesis demonstrates that combining structural econometric modelling with engineering-based risk analysis offers a useful framework for understanding and mitigating fuel price exposure. By linking structural shocks, nonlinear dependence patterns and hedging instruments within an integrated stress-testing architecture, the study provides actionable insights for both academic research and industrial decision-making. The methodology is general and can be extended to other energy-intensive sectors, supporting a broader understanding of commodity price risk in complex operational environments. 
+
+Overall, the thesis advances the structural analysis of oil-market dynamics and illustrates how econometric identification, basic tail-risk considerations and engineering-driven hedging strategies can be integrated into a coherent, albeit stylised, framework for scenario-based risk assessment in fuel-intensive industries.

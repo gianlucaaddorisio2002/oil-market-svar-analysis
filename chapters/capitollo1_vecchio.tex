@@ -1,0 +1,119 @@
+\chapter{Theoretical Background and Research Context}
+\label{chap:theory}
+
+\section{Motivation and Research Objectives}
+
+The dynamics of crude oil prices play a central role in global macroeconomic stability and in the performance of energy-intensive sectors, particularly freight and passenger transportation. Episodes of heightened volatility -- such as the shale revolution, the 2014--2016 price collapse, and the 2020 market turmoil \footnote{Look at the table, metti ref e rimetti tabella} -- highlight the importance of understanding the underlying drivers of oil price fluctuations. Identifying the structural sources of these movements is essential both for economic analysis and for designing effective hedging strategies for firms exposed to fuel costs.
+
+Building on the structural framework introduced by \textcite{Kilian2009} and subsequently refined by \textcite{KilianMurphy2014}, this thesis re-examines the behavior of the oil market over the period 1990--2024, a timeframe characterized by profound changes in market structure, financialization, and geopolitical uncertainty. Rather than assuming the classical taxonomy of shocks to be stable, the analysis tests whether the contribution and transmission of \emph{oil supply}, \emph{global demand}, and \emph{precautionary demand} shocks remain consistent across markedly different economic regimes.
+
+The objectives of this thesis are therefore fourfold:
+\begin{itemize}
+    \item \textbf{to assess the stability of Kilian’s structural taxonomy across multiple regimes (1990--2024)} by extracting structural shocks from a VAR/SVAR model and evaluating whether the traditional supply--demand--precautionary decomposition still provides an empirically meaningful representation of the oil market;
+    \item \textbf{to quantify how the dynamic effects of structural shocks have evolved over time} by analysing the impulse--response functions (\textit{IRF}), with particular attention to post-2010 episodes of financialization and reduced responsiveness of prices to fundamentals;
+    \item \textbf{to measure the extent to which structural shocks explain oil price variability in the modern era} through forecast error variance decomposition (\textit{FEVD}), evaluating whether fundamentals remain the primary drivers of volatility or whether residual, non-fundamental components dominate;
+    \item \textbf{to translate the structural insights into a risk-management perspective} by outlining how the estimated shock dynamics can inform hedging strategies for transportation firms exposed to fuel price fluctuations.
+\end{itemize}
+
+Overall, the thesis aims to determine whether the classical macroeconomic interpretation of oil price movements remains valid in the post-shale and post-pandemic period, and how these findings can be exploited in a practical corporate risk-management setting.
+
+
+\section{Theoretical Framework and Reference Literature}
+
+The economic literature traditionally identifies three structural determinants of crude oil price fluctuations: 
+\emph{supply shocks}, \emph{global aggregate demand shocks}, and \emph{precautionary (or inventory) demand shocks}. 
+In the historical period analysed by \textcite{Kilian2009} (1973–2007), the dominant component was global aggregate demand, reflecting the close link between oil consumption and the international business cycle. 
+Pure supply shocks, despite their popularity in public discourse, explained only a limited fraction of price variability \cite{Carollo2009}. 
+The introduction of precautionary demand, formalised in \textcite{KilianMurphy2014}, highlighted the role of expectations, inventories, and perceived scarcity, refining the microeconomic structure of the model.
+
+However, the more recent literature acknowledges that this taxonomy evolves over time. 
+Studies such as \textcite{BaumeisterKilian2016} and \textcite{KilianZhou2020} show that in the post-2010 period---characterised by the U.S. shale revolution, increased financialisation of energy markets, and rising geopolitical uncertainty---the relative importance of shocks changes: aggregate-demand shocks weaken, while precautionary (expectations-driven) and non-fundamental components become increasingly influential.  
+This shift is particularly relevant for samples that extend beyond the original 1973--2007 timeframe.
+
+This thesis fits within this structural VAR (SVAR) tradition, but extends it in two directions. First, it evaluates whether the classical taxonomy remains informative in a modern sample (1990–2024), marked by heterogeneous economic regimes. Second, it introduces preliminary modules---multivariate OLS, rolling windows, and copulas---to diagnose the presence of non-linearity, instability, and tail dependence in oil market data, thereby providing a methodological justification for adopting a dynamic multivariate framework.
+\section{Structure of Oil Shocks}
+
+Following the consolidated framework in the literature, oil price movements can be decomposed into three economically interpretable shocks:
+\begin{itemize}
+    \item \textbf{Supply shocks}: unexpected disruptions to global crude oil production, typically associated with geopolitical tensions, engineering failures, or OPEC policy decisions. In the short run, oil supply is nearly inelastic, as documented in \textcite{KilianZhou2020}.
+    \item \textbf{Aggregate demand shocks}: unanticipated changes in the demand for industrial commodities driven by global economic activity. These shocks were historically the predominant drivers of oil prices, particularly before the shale revolution.
+    \item \textbf{Precautionary demand shocks}: changes in expectations about future scarcity, reflected in inventory behaviour and market sentiment. These shocks capture the forward-looking, information-based nature of modern oil markets.
+\end{itemize}
+
+This conceptual taxonomy provides the structural interpretation for the identification strategy adopted in the VAR/SVAR models estimated in the following chapters.
+\section{Preliminary Evidence: Multivariate Linear Regression}
+
+Before turning to dynamic models, a static multivariate linear regression was estimated:
+\[
+\Delta \log(\text{WTI})_t 
+=
+\alpha
++ \beta_1 \Delta \log(\text{Prod})_t
++ \beta_2 \Delta \text{REA}_t
++ \beta_3 \Delta \log(\text{Inv})_t
++ \varepsilon_t.
+\]
+
+A comprehensive set of diagnostic tests was conducted:
+\begin{itemize}
+    \item Augmented Dickey–Fuller test confirming stationarity of differenced series;
+    \item correlation matrix to assess multicollinearity across regressors;
+    \item Wald test for joint significance of production, demand, and inventories;
+    \item residual diagnostics: normality (JB, KS), autocorrelation (Durbin–Watson, Ljung–Box), and heteroscedasticity (Breusch–Pagan);
+    \item parametric distribution fitting (Normal, Logistic, Student-\(t\)).
+\end{itemize}
+
+The results, summarised in Table~\ref{tab:ols-summary}, reveal:
+\begin{enumerate}
+    \item \textbf{limited global significance} and extremely low explanatory power;
+    \item \textbf{non-normal and fat-tailed residuals}, with the Student-\(t\) distribution providing the best fit;
+    \item \textbf{strong residual autocorrelation}, inconsistent with a memory-less model;
+    \item \textbf{marked heteroscedasticity}, reflecting volatility clustering.
+\end{enumerate}
+
+Collectively, these findings indicate that a static model is unable to capture the dynamics of crude oil markets, reinforcing the need for a multivariate dynamic approach.
+
+\begin{table}[h!] 
+\centering 
+\caption{Summary of preliminary OLS model results} \label{tab:ols-summary} 
+\vspace{0.25cm} 
+\setlength{\tabcolsep}{10pt} 
+<
+\end{table}
+
+\section{Rolling OLS Analysis}
+
+To examine the stability of linear relationships across regimes, the same static regression was estimated over several moving windows. Although some coefficients appear significant in isolated subsamples, their signs and magnitudes vary markedly, $R^2$ remains consistently low, and the Wald test frequently fails to reject joint insignificance.
+
+This instability demonstrates that the predictive relationships between oil prices and fundamentals are highly regime-dependent, and cannot be captured reliably by a static linear specification. These results motivate the adoption of a structural VAR, capable of modelling dynamic interactions, endogenous feedback, and time-dependent propagation of shocks.
+\section{Joint Densities and Copulas}
+
+Non-linear dependence between oil prices and fundamental variables was further analysed through Clayton, Gumbel, and Frank copulas. The analysis reveals:
+\begin{itemize}
+    \item evidence of asymmetric tail dependence;
+    \item stronger joint behaviour in lower or upper tails depending on the variable pair;
+    \item nonlinear structures incompatible with linear correlation measures.
+\end{itemize}
+
+These findings provide an additional empirical rationale for moving beyond OLS and employing dynamic structural models.
+\section{Empirical Motivation for Using a VAR/SVAR}
+
+Synthesising the previous results:
+\begin{enumerate}
+    \item the series exhibit temporal dependence inconsistent with static regressions;
+    \item significant nonlinearities and fat tails are present;
+    \item OLS relationships are unstable and regime-dependent;
+    \item the classical taxonomy of shocks may not remain constant over time.
+\end{enumerate}
+
+A structural VAR model with lag length \(p = 7\), validated through stability and residual diagnostics, is therefore adopted. This framework enables the extraction of economically interpretable structural shocks and the study of their dynamic effects through IRFs and FEVD.
+\section{Thesis Structure}
+
+The thesis is organised as follows:
+\begin{itemize}
+    \item \textbf{Chapter 1}: theoretical foundations, literature review, preliminary empirical diagnostics.
+    \item \textbf{Chapter 2}: dataset construction and econometric methodology.
+    \item \textbf{Chapter 3}: estimation of the VAR and SVAR models.
+    \item \textbf{Chapter 4}: analysis of structural shocks, IRF, and FEVD across regimes.
+    \item \textbf{Chapter 5}: implications for risk management and hedging strategies.
+\end{itemize}

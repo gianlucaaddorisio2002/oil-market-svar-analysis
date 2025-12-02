@@ -1,0 +1,308 @@
+\chapter{Dispensa}
+\section{Dalla Regressione Lineare Statica al Modello VAR Dinamico}
+
+In una prima fase dell’analisi è stato stimato un modello lineare statico di tipo OLS con variabile dipendente la variazione del prezzo del petrolio (WTI) e tre regressori fondamentali: produzione di petrolio, attività economica globale (REA) e scorte. Il modello, stimato tramite il comando \texttt{fitlm} di MATLAB, ha restituito risultati coerenti con quanto atteso dalla letteratura sulle serie energetiche: bassa capacità esplicativa, scarsa significatività dei coefficienti e violazioni sistematiche delle assunzioni classiche dell’OLS.
+
+\subsection{Limiti del modello statico}
+La diagnostica condotta sui residui ha mostrato:
+\begin{itemize}
+    \item \textbf{autocorrelazione seriale} (Ljung--Box sempre significativo);
+    \item \textbf{eteroschedasticità} (Breusch--Pagan con $p=0$);
+    \item \textbf{non normalità nelle code} (deviazioni marcate nel QQ-plot e presenza di heavy tails);
+    \item \textbf{R\textsuperscript{2} estremamente basso} e \textbf{coefficiente di determinazione corretto quasi nullo};
+    \item \textbf{instabilità parametrica nel tempo}, confermata dall’analisi rolling.
+\end{itemize}
+
+Tali evidenze indicano che il modello statico non riesce a catturare la dinamica del processo generatore dei dati, caratterizzato da forte dipendenza temporale, non linearità, shock e comportamenti asimmetrici nelle code. L’OLS si rivela quindi inadeguato per descrivere la relazione tra variabili macroeconomiche e prezzo del petrolio.
+
+\subsection{Motivazione per il passaggio al modello VAR}
+Per superare i limiti del modello statico, è stato adottato un modello VAR (Vector Autoregression), che consente di:
+\begin{itemize}
+    \item modellare simultaneamente le interazioni dinamiche tra più variabili endogene;
+    \item catturare la propagazione degli shock nel tempo;
+    \item incorporare memoria tramite valori ritardati (lag);
+    \item produrre strumenti di analisi dinamica quali Impulse Response Functions (IRF) e Forecast Error Variance Decomposition (FEVD).
+\end{itemize}
+
+A differenza dell’OLS, che impone una struttura unidirezionale e contemporanea, il VAR consente a ciascuna variabile di influenzare e di essere influenzata dalle altre nel tempo. La specificazione stimata è un modello VAR(p), selezionato sulla base di criteri di stabilità e diagnosi dei residui, con $p=7$ ritardi mensili. Questo approccio segue la tradizione della letteratura sui mercati petroliferi (Kilian, 2009; Kilian and Murphy, 2014), dove l’utilizzo di un numero elevato di lag è standard per garantire residui non autocorrelati.
+
+\subsection{Cosa si conserva e cosa cambia rispetto all’OLS}
+L’analisi OLS preliminare fornisce informazioni utili, ma limitate:
+\begin{itemize}
+    \item si conferma che la domanda globale (REA) mostra il legame più consistente con il WTI;
+    \item produzione e scorte risultano debolmente informative in forma contemporanea;
+    \item la struttura delle code e la non linearità richiedono modelli più flessibili.
+\end{itemize}
+
+Il modello VAR introduce invece nuovi elementi fondamentali:
+\begin{itemize}
+    \item \textbf{dinamica temporale} tramite valori ritardati;
+    \item \textbf{relazioni bi-direzionali} tra tutte le variabili;
+    \item possibilità di identificare \textbf{shock strutturali} (supply, demand, precautionary);
+    \item \textbf{analisi IRF e FEVD} per studiare come gli shock si propagano e quale quota della varianza del WTI essi spiegano;
+    \item base per la \textbf{Historical Decomposition} e per applicazioni di risk management.
+\end{itemize}
+
+\subsection{Struttura del modello VAR stimato}
+Il modello stimato è un VAR(7) sulle serie stazionarie \textit{Production\_DL}, \textit{REA\_DL}, \textit{WTI\_real\_DL} e \textit{Inventories\_DL}, definito come:
+\[
+    Y_t = A_1 Y_{t-1} + A_2 Y_{t-2} + \dots + A_7 Y_{t-7} + u_t,
+\]
+dove $Y_t$ contiene le quattro variabili del sistema. Il modello risulta stabile e i residui non presentano autocorrelazione, garantendo la validità econometrica delle IRF e delle decomposizioni successive.
+
+\subsection{Obiettivi dell’analisi VAR}
+L’adozione del modello VAR consente di:
+\begin{enumerate}
+    \item valutare la risposta dinamica delle variabili agli shock fondamentali;
+    \item quantificare l’importanza relativa di ciascuno shock (FEVD);
+    \item identificare la natura dei movimenti del prezzo del petrolio (supply, demand, precautionary);
+    \item fornire la base per applicazioni di \textbf{hedging}, \textbf{stress test} e \textbf{scenario analysis} per imprese esposte al rischio energetico.
+\end{enumerate}
+
+In sintesi, il passaggio dal modello OLS al modello VAR rappresenta un’evoluzione necessaria e metodologicamente fondata, che permette di descrivere in modo realistico il comportamento dinamico del mercato petrolifero.
+
+\section{Dal modello OLS statico al VAR dinamico e al VAR strutturale}
+
+In una prima fase dell'analisi è stato stimato un modello lineare statico (OLS) che mette in relazione la variazione del prezzo reale del petrolio con tre fondamentali osservabili del mercato:
+
+\begin{equation}
+\Delta \log(\text{WTI}_t) 
+= \alpha 
++ \beta_1 \Delta \log(\text{Production}_t)
++ \beta_2 \Delta \text{REA}_t
++ \beta_3 \Delta \log(\text{Inventories}_t)
++ \varepsilon_t.
+\end{equation}
+
+I risultati empirici di questa regressione mostrano:
+\begin{itemize}
+    \item un coefficiente di determinazione $R^2$ molto basso e $Adj.\,R^2$ prossimo a zero;
+    \item un numero limitato di coefficienti statisticamente significativi;
+    \item residui affetti da autocorrelazione (test di Ljung--Box), eteroschedasticità (Breusch--Pagan) e deviazioni dalla normalità nelle code;
+    \item evidenza, tramite analisi rolling, di instabilità del legame nel tempo.
+\end{itemize}
+
+In sintesi, il modello OLS statico ha un contenuto informativo limitato: le variabili fondamentali considerate (produzione, attività economica, scorte) spiegano solo una frazione minima della variabilità di breve periodo del prezzo del petrolio, e le ipotesi classiche dell'OLS risultano sistematicamente violate. Ciò suggerisce che la dinamica del mercato petrolifero non possa essere descritta in termini di relazioni contemporanee e statiche, ma richieda un modello esplicitamente dinamico.
+
+\subsection{Adozione di un modello VAR dinamico}
+
+Per superare i limiti del modello statico è stato stimato un modello VAR sulle serie stazionarie in differenze logaritmiche:
+
+\begin{equation}
+Y_t = 
+\begin{bmatrix}
+\Delta \log(\text{Production}_t) \\
+\Delta \text{REA}_t \\
+\Delta \log(\text{WTI}_t) \\
+\Delta \log(\text{Inventories}_t)
+\end{bmatrix}
+=
+A_1 Y_{t-1} + A_2 Y_{t-2} + \dots + A_p Y_{t-p} + u_t,
+\end{equation}
+
+dove $u_t$ è il vettore degli errori ridotti-forma. Tramite una procedura incrementale si è considerato un ordine $p$ da 1 a 8, verificando per ciascun modello:
+\begin{enumerate}
+    \item la \emph{stabilità} (tutti gli autovalori della companion matrix all'interno del cerchio unitario);
+    \item l'\emph{assenza di autocorrelazione residua} (test di Ljung--Box sui residui di ciascuna equazione).
+\end{enumerate}
+
+Tutti i modelli risultano stabili, ma l'autocorrelazione residua viene eliminata solo a partire da $p=7$. Il VAR(7) rappresenta quindi il primo modello econometricamente valido (stabile e con residui assimilabili a rumore bianco), ed è adottato come specificazione finale. Questo risultato conferma che il sistema petrolifero presenta una \emph{memoria lunga}: sono necessari almeno sette ritardi mensili per catturare in modo adeguato la dinamica congiunta di produzione, attività economica, prezzo e scorte.
+
+\subsection{IRF e FEVD del VAR(7): cosa aggiunge rispetto all'OLS}
+
+Una volta stimato il VAR(7), è possibile analizzare:
+\begin{itemize}
+    \item le \emph{Impulse Response Functions} (IRF), che descrivono la risposta dinamica di ciascuna variabile a uno shock unitario nelle altre;
+    \item la \emph{Forecast Error Variance Decomposition} (FEVD), che quantifica la quota di varianza dell'errore di previsione attribuibile a ciascun shock.
+\end{itemize}
+
+L'identificazione iniziale avviene tramite una decomposizione di Cholesky della matrice di covarianza degli errori, assumendo l'ordine economico
+\[
+\text{Production} \rightarrow \text{REA} \rightarrow \text{WTI} \rightarrow \text{Inventories},
+\]
+coerente con l'idea che la produzione sia più esogena nel breve periodo, seguita dall'attività economica, dal prezzo e infine dalle scorte.
+
+Le IRF ortogonalizzate mostrano che:
+\begin{itemize}
+    \item uno shock nella produzione (interpretabile, in ridotto-forma, come perturbazione lato offerta) genera una risposta del prezzo del WTI piccola, oscillante e di breve durata;
+    \item uno shock nella REA (domanda aggregata) induce una reazione relativamente più ampia del prezzo, concentrata nei primi mesi, ma non particolarmente persistente;
+    \item uno shock positivo nelle scorte commerciali (\emph{Inventories}) tende, in ridotto-forma, ad associare un calo temporaneo del prezzo, coerente con un aumento percepito della disponibilità fisica, ma non identificabile di per sé come \emph{shock di domanda precauzionale}.
+\end{itemize}
+
+La FEVD del WTI conferma che gli shock fondamentali spiegano solo una quota ridotta della variabilità del prezzo:
+\begin{itemize}
+    \item shock associati alla produzione di petrolio spiegano circa il $2.8\%$ della varianza del WTI a 30 mesi;
+    \item shock legati all'attività economica (domanda aggregata) spiegano circa il $5.9\%$;
+    \item shock sulle scorte spiegano circa il $9.8\%$;
+    \item il residuo della varianza (oltre l'80\%) è attribuibile a innovazioni idiosincratiche del prezzo stesso.
+\end{itemize}
+
+Questi risultati sono coerenti con l'evidenza del modello OLS: anche in un contesto dinamico multivariato, i fondamentali inclusi nel modello spiegano solo una frazione limitata dei movimenti del prezzo. Tuttavia, rispetto all'OLS, il VAR consente di:
+\begin{itemize}
+    \item modellare esplicitamente la \emph{propagazione temporale} degli shock;
+    \item distinguere tra orizzonti di breve e medio periodo;
+    \item decomporre la varianza del prezzo tra le diverse fonti di innovazione.
+\end{itemize}
+
+\subsection{Perché il VAR ridotto-forma non è ancora sufficiente}
+
+Il VAR stimato finora è un modello \emph{di forma ridotta}: gli shock $u_t$ sono innovazioni statistiche, ortogonalizzate tramite Cholesky, ma non hanno ancora un significato economico univoco. In particolare:
+\begin{itemize}
+    \item uno shock nella variabile ``scorte'' non coincide automaticamente con uno shock di \emph{domanda precauzionale}; può riflettere variazioni stagionali, sorprese negli stoccaggi, decisioni dell'OPEC o altre componenti miste;
+    \item uno shock nella produzione non è necessariamente un puro shock di offerta esogena, ma può inglobare risposte endogene del lato produttivo a shock di domanda;
+    \item la decomposizione Cholesky dipende in modo forte dall'ordine delle variabili e impone una struttura triangolare che raramente coincide con la struttura economica vera.
+\end{itemize}
+
+In assenza di ulteriori restrizioni, gli shock ridotti-forma non permettono di distinguere in modo pulito tra:
+\begin{enumerate}
+    \item \textbf{shock di offerta} (esogeni alla produzione fisica di petrolio);
+    \item \textbf{shock di domanda aggregata} (legati al ciclo economico globale);
+    \item \textbf{shock di domanda precauzionale} (variazioni nelle aspettative di scarsità futura che si manifestano tramite movimenti congiunti di prezzo e scorte).
+\end{enumerate}
+
+Per esempio, nella formulazione di \textcite{KilianMurphy2014}, uno shock di domanda precauzionale è definito come uno shock che, nel breve periodo, fa salire il prezzo del petrolio e scendere le scorte commerciali, in quanto gli operatori accumulano petrolio per motivi precauzionali. Un semplice shock positivo nelle scorte osservate non soddisfa questa firma: al contrario, un aumento delle scorte commerciali tende a segnalare abbondanza fisica e quindi a ridurre il prezzo. Ne consegue che l'IRF ridotto-forma ``Inventories $\rightarrow$ WTI'' non può essere interpretata direttamente come risposta a uno shock di domanda precauzionale.
+
+In altri termini, il VAR ridotto-forma fornisce una descrizione corretta della dinamica statistica, ma non identifica ancora gli \emph{shock strutturali} sottostanti.
+
+\subsection{Verso un VAR strutturale con restrizioni di segno}
+
+Per passare dagli shock ridotti-forma $u_t$ agli shock strutturali $\varepsilon_t$ è necessario introdurre una matrice di impatto $B$ tale che:
+\begin{equation}
+u_t = B \varepsilon_t, \qquad
+E[\varepsilon_t \varepsilon_t'] = I.
+\end{equation}
+La scelta di $B$ non è unica: molte matrici diverse generano la stessa matrice di covarianza dei residui, $\Sigma_u = E[u_t u_t'] = B B'$. La decomposizione di Cholesky fornisce una particolare $B$, ma impone una struttura rigida (triangolare) e fortemente dipendente dall'ordinamento delle variabili.
+
+L'approccio proposto da \textcite{Kilian2009} e \textcite{KilianMurphy2014} consiste nell'utilizzare un insieme di \emph{restrizioni di segno} sulle IRF per identificare gli shock strutturali. In pratica:
+\begin{itemize}
+    \item si generano molte possibili matrici $B$ compatibili con $\Sigma_u$ (ad esempio rotazioni casuali della fattorizzazione di Cholesky);
+    \item per ciascuna di esse si calcolano le IRF strutturali e si verifica se soddisfano un insieme di segni attesi nei primi periodi (es.\,0--3 mesi);
+    \item si conservano solo le decomposizioni che rispettano tutte le restrizioni di segno, ottenendo così una famiglia di IRF coerenti con la teoria economica.
+\end{itemize}
+
+Esempi di restrizioni di segno possono essere:
+\begin{itemize}
+    \item \textbf{shock di offerta}: produzione in diminuzione, prezzo del WTI in aumento, scorte in diminuzione nel breve periodo;
+    \item \textbf{shock di domanda aggregata}: attività economica (REA) e prezzo del WTI entrambe in aumento nel breve periodo;
+    \item \textbf{shock di domanda precauzionale}: prezzo del WTI in aumento e scorte commerciali in diminuzione, con effetti limitati sulla produzione e sull'attività reale nel brevissimo termine.
+\end{itemize}
+
+L'uso di restrizioni di segno consente di:
+\begin{enumerate}
+    \item separare gli shock osservati nelle equazioni ridotte-forma in tre categorie economicamente interpretabili;
+    \item ottenere IRF strutturali e FEVD che abbiano un significato microfondato;
+    \item collegare la dinamica del prezzo del petrolio a scenari di rischio ben definiti (shock di offerta, domanda aggregata, domanda precauzionale) utili per analisi di \emph{stress testing} e strategie di \emph{hedging}.
+\end{enumerate}
+
+In conclusione, il passaggio OLS $\rightarrow$ VAR(7) permette di modellare in modo consistente la dinamica del sistema e di valutare il contributo complessivo dei fondamentali alla volatilità del prezzo del petrolio. Tuttavia, solo l'estensione a un VAR strutturale con restrizioni di segno consente di identificare in maniera credibile i tre shock fondamentali dell'economia petrolifera e di trasformare i risultati del modello in strumenti operativi per la gestione del rischio.
+
+\section{Dal VAR ridotto-forma al VAR strutturale con restrizioni di segno}
+
+Una volta stimato un modello VAR ridotto-forma, è possibile analizzare la dinamica congiunta delle variabili tramite le funzioni di risposta agli impulsi (IRF) e la scomposizione della varianza dell'errore di previsione (FEVD). Tuttavia, gli shock del VAR ridotto-forma non hanno un significato economico univoco: rappresentano semplici innovazioni statistiche, non interpretabili direttamente come shock di offerta, di domanda aggregata o di domanda precauzionale.
+
+Per ottenere una decomposizione economica degli shock è necessario passare a un modello VAR \textit{strutturale} (SVAR), introducendo una matrice di impatto $B$ tale che:
+\[
+u_t = B \varepsilon_t, \qquad E[\varepsilon_t \varepsilon_t'] = I,
+\]
+dove $u_t$ sono i residui ridotto-forma e $\varepsilon_t$ rappresentano gli shock strutturali. Poiché la matrice $B$ non è identificata univocamente dalla matrice di covarianza $E[u_t u_t']$, è necessario introdurre ulteriori restrizioni.
+
+Seguendo l’approccio proposto da \textcite{Kilian2009} e \textcite{KilianMurphy2014}, si adottano \emph{restrizioni di segno} sulle IRF nei primi istanti di risposta. L’idea è semplice: ogni shock strutturale deve produrre nel brevissimo periodo un insieme di risposte con segni coerenti con la teoria economica.
+
+Nel caso in esame, le restrizioni adottate sono:
+
+\begin{itemize}
+    \item \textbf{Shock di offerta (Supply shock)}: la produzione diminuisce e il prezzo del petrolio aumenta nell'immediato;
+    \item \textbf{Shock di domanda aggregata}: l'attività economica (REA) aumenta e il prezzo del petrolio aumenta nell'immediato;
+    \item \textbf{Shock di domanda precauzionale}: le scorte commerciali diminuiscono e il prezzo del petrolio aumenta nell'immediato.
+\end{itemize}
+
+Per identificare gli shock strutturali si generano migliaia di matrici ortogonali casuali $Q$ (rotazioni), applicate alla fattorizzazione di Cholesky del VAR. Solo le rotazioni che soddisfano simultaneamente tutte le restrizioni di segno vengono accettate.
+
+L’insieme delle IRF accettate viene quindi sintetizzato tramite la mediana (IRF strutturali) e bande di confidenza percentile (IRF\_low e IRF\_high). Questo processo permette di isolare i tre shock fondamentali del mercato petrolifero e di ottenere IRF e FEVD con interpretazione economica coerente, superando i limiti identificativi del VAR ridotto-forma.
+
+\section{Risultati del modello SVAR a restrizioni di segno}
+
+Una volta stimato il modello VAR ridotto-forma e verificata la debole interpretabilità
+economica degli shock identificati tramite decomposizione di Cholesky, si procede alla
+stima di un modello SVAR con restrizioni di segno in stile \textcite{Kilian2009} e
+\textcite{KilianMurphy2014}. Tale passaggio permette di identificare in modo credibile gli
+shock strutturali fondamentali del mercato del petrolio: shock di offerta, shock di domanda
+aggregata e shock di domanda precauzionale.
+
+Le restrizioni di segno imposte all'impatto sono le seguenti:
+
+\begin{itemize}
+    \item \textbf{Shock di offerta (supply shock)}: la produzione diminuisce e il prezzo del petrolio aumenta ($\Delta\text{Production}<0$, $\Delta\text{WTI}>0$).
+    \item \textbf{Shock di domanda aggregata}: l'attività economica aumenta e il prezzo del petrolio aumenta ($\Delta\text{REA}>0$, $\Delta\text{WTI}>0$).
+    \item \textbf{Shock di domanda precauzionale}: le scorte commerciali diminuiscono e il prezzo del petrolio aumenta ($\Delta\text{Inventories}<0$, $\Delta\text{WTI}>0$).
+\end{itemize}
+
+La procedura di identificazione consiste nel generare rotazioni ortogonali casuali della
+fattorizzazione di Cholesky e nel selezionare esclusivamente le matrici di impatto
+compatibili con le firme dei segni sopra indicate. L’insieme delle IRF accettate viene
+quindi sintetizzato tramite la mediana, ottenendo così le IRF strutturali.
+
+\subsection{Impulse Response Functions strutturali}
+
+Le IRF strutturali del prezzo del petrolio (WTI) ai tre shock fondamentali presentano
+caratteristiche coerenti con la teoria economica e con l’evidenza empirica più recente.
+
+\paragraph{Shock di offerta.}
+Lo shock di offerta (diminuzione esogena della produzione di petrolio) genera una
+risposta immediata e molto ampia del prezzo del petrolio. L’impatto all’impatto è
+positivo e significativo, con un effetto di breve periodo che si smorza progressivamente
+entro circa cinque mesi. Tale dinamica è coerente con episodi di shock geopolitici,
+interruzioni inattese della produzione o interventi restrittivi dell’OPEC. La forma
+dell’IRF riproduce fedelmente la dinamica presentata da \textcite{Kilian2009}.
+
+\paragraph{Shock di domanda aggregata.}
+Uno shock di domanda aggregata (crescita dell'attività reale globale) produce un aumento
+del prezzo del petrolio più contenuto rispetto allo shock di offerta. L’impulso iniziale è
+positivo ma modesto, seguito da un temporaneo rimbalzo negativo e da una rapida
+riconvergenza verso lo zero. Questo risultato suggerisce che, negli anni recenti, la
+domanda globale esercita un ruolo meno dominante nei movimenti del prezzo del petrolio,
+in linea con l’evidenza post-2014 che sottolinea un crescente peso degli shock
+specifici dell’industria petrolifera rispetto ai cicli economici globali.
+
+\paragraph{Shock di domanda precauzionale.}
+Lo shock di domanda precauzionale, definito come una variazione nelle aspettative di
+scarsità futura che induce gli operatori ad accumulare scorte oggi, genera un aumento
+iniziale del prezzo del petrolio, sebbene di entità moderata. L’effetto si attenua rapidamente,
+diventando leggermente negativo nei mesi successivi per poi convergere verso lo zero.
+L’impatto relativamente debole di questo shock riflette la minore rilevanza, negli anni
+recenti, delle aspettative di scarsità futura rispetto al periodo 1970--2005 analizzato
+dalla letteratura classica.
+
+\subsection{Forecast Error Variance Decomposition strutturale}
+
+La scomposizione strutturale della varianza dell’errore di previsione del prezzo del
+petrolio fornisce una chiara misura dell’importanza relativa dei tre shock identificati.
+A un orizzonte di 24 mesi, i risultati principali sono:
+
+\begin{itemize}
+    \item lo \textbf{shock di offerta} spiega circa il \textbf{50.8\%} della variabilità del WTI;
+    \item lo \textbf{shock di domanda aggregata} spiega circa il \textbf{15.0\%};
+    \item lo \textbf{shock di domanda precauzionale} spiega circa l’\textbf{8.1\%};
+    \item la restante quota è attribuibile a innovazioni proprie del prezzo del petrolio
+          e a componenti non spiegate dalle tre categorie di shock.
+\end{itemize}
+
+Questi valori rappresentano una marcata differenza rispetto ai risultati ottenuti dal VAR
+ridotto-forma. In particolare, mentre il modello ridotto-forma attribuiva oltre l’80\% della
+variabilità del WTI a innovazioni proprie del prezzo, lo SVAR a restrizioni di segno
+redistribuisce gran parte della varianza verso gli shock strutturali, in particolare verso lo
+shock di offerta.
+
+\subsection{Discussione}
+
+Il modello SVAR rivela che la volatilità del prezzo del petrolio è dominata dagli shock di
+offerta. Gli shock di domanda aggregata svolgono un ruolo secondario, e gli shock di
+domanda precauzionale hanno un impatto limitato ma comunque non trascurabile.
+Questa evidenza è completamente coerente con la letteratura più recente e con la
+finanziarizzazione dei mercati petroliferi.
+
+Nel complesso, il modello SVAR consente di identificare correttamente le tre fonti
+strutturali di shock nel mercato del petrolio, superando le limitazioni del VAR
+ridotto-forma e fornendo una base quantitativa affidabile per la costruzione di scenari di
+rischio e per lo sviluppo di strategie di hedging per gli operatori esposti alle fluttuazioni
+del prezzo del petrolio.

@@ -1,0 +1,254 @@
+@article{Kilian2009,
+  author       = {Kilian, Lutz},
+  title        = {Not All Oil Price Shocks Are Alike: Disentangling Demand and Supply Shocks in the Crude Oil Market},
+  journal      = {American Economic Review},
+  volume       = {99},
+  number       = {3},
+  pages        = {1053--1069},
+  year         = {2009},
+  doi          = {10.1257/aer.99.3.1053}
+}
+
+@article{BarskyKilian2002,
+  author       = {Barsky, Robert and Kilian, Lutz},
+  title        = {Do We Really Know that Oil Caused the Great Stagflation? A Monetary Explanation},
+  journal      = {NBER Macroeconomics Annual},
+  volume       = {16},
+  pages        = {137--183},
+  year         = {2002},
+  doi          = {10.1086/654451}
+}
+
+@article{BarskyKilian2004,
+  author       = {Barsky, Robert and Kilian, Lutz},
+  title        = {Oil and the Macroeconomy since the 1970s},
+  journal      = {Journal of Economic Perspectives},
+  volume       = {18},
+  number       = {4},
+  pages        = {115--134},
+  year         = {2004},
+  doi          = {10.1257/0895330042632708}
+}
+
+@article{BaumeisterPeersman2013,
+  author       = {Baumeister, Christiane and Peersman, Gert},
+  title        = {Time-Varying Effects of Oil Supply Shocks on the US Economy},
+  journal      = {American Economic Journal: Macroeconomics},
+  volume       = {5},
+  number       = {4},
+  pages        = {1--28},
+  year         = {2013},
+  doi          = {10.1257/mac.5.4.1}
+}
+
+@article{KilianMurphy2014,
+  author       = {Kilian, Lutz and Murphy, Daniel},
+  title        = {The Role of Inventories and Speculative Trading in the Global Market for Crude Oil},
+  journal      = {Journal of Applied Econometrics},
+  volume       = {29},
+  number       = {3},
+  pages        = {454--478},
+  year         = {2014},
+  doi          = {10.1002/jae.2322}
+}
+
+@article{BaumeisterKilian2016,
+  author       = {Baumeister, Christiane and Kilian, Lutz},
+  title        = {Forty Years of Oil Price Fluctuations: Why the Price of Oil May Still Surprise Us},
+  journal      = {Journal of Economic Perspectives},
+  volume       = {30},
+  number       = {1},
+  pages        = {139--160},
+  year         = {2016}
+}
+
+
+@article{KilianMurphy2012,
+  author       = {Kilian, Lutz and Murphy, Daniel},
+  title        = {Why Agnostic Sign Restrictions Are Not Enough: Understanding the Dynamics of Oil Market VAR Models},
+  journal      = {Journal of the European Economic Association},
+  volume       = {10},
+  number       = {5},
+  pages        = {1166--1188},
+  year         = {2012},
+  doi          = {10.1111/j.1542-4774.2012.01080.x}
+}
+
+@article{KilianLewis2011,
+  author       = {Kilian, Lutz and Lewis, Logan},
+  title        = {Does the Fed Respond to Oil Price Shocks?},
+  journal      = {Economic Journal},
+  volume       = {121},
+  number       = {555},
+  pages        = {1047--1072},
+  year         = {2011},
+  doi          = {10.1111/j.1468-0297.2011.02437.x}
+}
+
+@article{KilianHicks2013,
+  author       = {Kilian, Lutz and Hicks, Bruce},
+  title        = {Did Unexpectedly Strong Economic Growth Cause the Oil Price Shock of 2003–2008?},
+  journal      = {Journal of Forecasting},
+  volume       = {32},
+  number       = {5},
+  pages        = {385--394},
+  year         = {2013},
+  doi          = {10.1002/for.2243}
+}
+
+@article{Hamilton2003,
+  author       = {Hamilton, James D.},
+  title        = {What is an Oil Shock?},
+  journal      = {Journal of Econometrics},
+  volume       = {113},
+  number       = {2},
+  pages        = {363--398},
+  year         = {2003},
+  doi          = {10.1016/S0304-4076(02)00207-5}
+}
+
+@article{PeersmanRobays2009,
+  author       = {Peersman, Gert and Van Robays, Ine},
+  title        = {Oil and the Euro Area Economy},
+  journal      = {Economic Policy},
+  volume       = {24},
+  number       = {60},
+  pages        = {603--651},
+  year         = {2009},
+  doi          = {10.1111/j.1468-0327.2009.00231.x}
+}
+
+
+
+@book{Lutkepohl2005,
+  author    = {L{\"u}tkepohl, Helmut},
+  title     = {New Introduction to Multiple Time Series Analysis},
+  publisher = {Springer},
+  year      = {2005},
+  doi       = {10.1007/978-3-540-27752-1}
+}
+
+@article{Sims1980,
+  author       = {Sims, Christopher A.},
+  title        = {Macroeconomics and Reality},
+  journal      = {Econometrica},
+  volume       = {48},
+  number       = {1},
+  pages        = {1--48},
+  year         = {1980},
+  doi          = {10.2307/1912017}
+}
+
+@article{Uhlig2005,
+  author       = {Uhlig, Harald},
+  title        = {What Are the Effects of Monetary Policy on Output?},
+  journal      = {Journal of Monetary Economics},
+  volume       = {52},
+  number       = {2},
+  pages        = {381--419},
+  year         = {2005},
+  doi          = {10.1016/j.jmoneco.2004.05.007}
+}
+
+@article{AlquistKilianVigfusson2013,
+  author       = {Alquist, Ron and Kilian, Lutz and Vigfusson, Robert},
+  title        = {Forecasting the Price of Oil},
+  journal      = {Handbook of Economic Forecasting},
+  volume       = {2},
+  pages        = {427--507},
+  year         = {2013},
+  doi          = {10.1016/B978-0-444-53683-9.00009-1}
+}
+
+@article{DvirRogoff2010,
+  author       = {Dvir, Eyal and Rogoff, Kenneth},
+  title        = {Three Epochs of Oil},
+  journal      = {Journal of International Economics},
+  volume       = {86},
+  number       = {2},
+  pages        = {271--282},
+  year         = {2012},
+  doi          = {10.1016/j.jinteco.2011.10.011}
+}
+
+@article{Smith2009,
+  author    = {Smith, James},
+  title     = {World Oil: Market or Mayhem?},
+  journal   = {Journal of Economic Perspectives},
+  volume    = {23},
+  number    = {3},
+  pages     = {145--164},
+  year      = {2009},
+  doi       = {10.1257/jep.23.3.145}
+}
+
+
+
+
+@article{Patton2006,
+  author       = {Patton, Andrew},
+  title        = {Modelling Asymmetric Exchange Rate Dependence},
+  journal      = {International Economic Review},
+  volume       = {47},
+  number       = {2},
+  pages        = {527--556},
+  year         = {2006}
+}
+
+@article{Joe1997,
+  author    = {Joe, Harry},
+  title     = {Multivariate Models and Dependence Concepts},
+  year      = {1997},
+  publisher = {Chapman and Hall}
+}
+
+
+@misc{EIAWTI,
+  author       = {U.S. Energy Information Administration},
+  title        = {WTI Crude Oil Prices (DCOILWTICO)},
+  year         = {2024},
+  url          = {https://www.eia.gov},
+  note         = {Accessed: 2024-11-01}
+}
+
+@misc{EIAJetFuel,
+  author       = {U.S. Energy Information Administration},
+  title        = {EER\_EPJK\_PF4\_RGC\_DPG Jet Fuel Price Series},
+  year         = {2024},
+  url          = {https://www.eia.gov},
+  note         = {Accessed: 2024-11-01}
+}
+
+@misc{FREDCPI,
+  author       = {Federal Reserve Bank of St. Louis},
+  title        = {Consumer Price Index for All Urban Consumers (CPIAUCSL)},
+  year         = {2024},
+  url          = {https://fred.stlouisfed.org},
+  note         = {Accessed: 2024-11-01}
+}
+
+@misc{OCSEIndex,
+  author       = {OECD},
+  title        = {OECD Industrial Production Index},
+  year         = {2024},
+  url          = {https://data.oecd.org},
+  note         = {Accessed: 2024-11-01}
+}
+
+@misc{EIAInventories,
+  author       = {U.S. Energy Information Administration},
+  title        = {Ending Stocks of Crude Oil},
+  year         = {2024},
+  url          = {https://www.eia.gov},
+  note         = {Accessed: 2024-11-01}
+}
+
+
+@techreport{KilianZhou2020,
+  author       = {Kilian, Lutz and Zhou, Xiaoqing},
+  title        = {The Econometrics of Oil Market VAR Models},
+  institution  = {Federal Reserve Bank of Dallas},
+  year         = {2020},
+  type         = {Working Paper}
+}
+

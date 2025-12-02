@@ -1,0 +1,140 @@
+\chapter{Data Construction and Pre-VAR Diagnostics}
+
+\section*{A.1 Data Sources, Frequency Alignment and Storage}
+
+The empirical analysis relies on monthly data spanning 1990--2024 for four
+key variables: global crude oil production, OECD real activity (aggregate
+industrial index), petroleum inventories and the real WTI price. Raw series
+are gathered from the sources listed in Table~\ref{tab:data_sources} in
+Chapter~\ref{ch:data-methods} and then harmonised to a common monthly calendar.
+
+All series are first converted to end-of-month observations and aligned on a
+shared time index. When a series is released at a different frequency or with
+occasional missing values, the following conventions are applied:
+
+\begin{itemize}
+    \item quarterly or higher-frequency observations are aggregated or
+    averaged to the monthly frequency, preserving the timing conventions of
+    the original release;
+    \item isolated missing entries are linearly interpolated only when this is
+    necessary to avoid spurious gaps within otherwise continuous stretches of
+    data; no series is forward- or backward-filled over extended periods;
+    \item outlier values clearly attributable to data errors are replaced by
+    the median of a narrow neighbourhood, with all adjustments documented in
+    the \texttt{build\_oil\_dataset.m} script.
+\end{itemize}
+
+After alignment, three data structures are created and stored in
+\texttt{clean\_data.mat}:
+
+\begin{itemize}
+    \item \texttt{All}: timetable of raw levels or log-levels (real WTI price,
+    crude oil production, OECD activity index, petroleum inventories);
+    \item \texttt{All\_d}: timetable of stationary transformations
+    (first differences or $\Delta \log$ transforms), subsequently
+    standardised to zero mean and unit variance;
+    \item \texttt{ALL\_VAR}: numeric matrix used as input for the VAR
+    estimation, with columns ordered as Production, OECD, WTI and Inventories
+    and rows corresponding to common monthly dates.
+\end{itemize}
+
+The OECD activity index is chosen as the global demand proxy because, within
+the sample, it displays a more stable dynamic relationship with the real WTI
+price than the IGREA index, while avoiding some of the measurement revisions
+associated with shipping-based indicators
+\parencite{Kilian2009,Kilian2019}.
+
+\section*{A.2 Transformations and Stationarity Checks}
+
+The construction of \texttt{All\_d} follows the standard practice of rendering
+the series approximately covariance-stationary before specifying a VAR.
+
+\begin{itemize}
+    \item Crude oil production, the real WTI price and inventories are
+    transformed using $\Delta \log$ differences, which correspond
+    approximately to monthly percentage changes.
+    \item The OECD activity index is decomposed into a low-frequency trend and
+    a cyclical component; the latter (denoted \texttt{OECD\_cycle}) is used in
+    the VAR to capture global business-cycle fluctuations around the long-run
+    level.
+    \item Each stationary transformation is then standardised to zero mean and
+    unit variance, so that the corresponding VAR coefficients and impulse
+    responses are expressed in comparable units.
+\end{itemize}
+
+Augmented Dickey--Fuller (ADF) tests are applied both to the original levels
+and to the transformed series. In levels, the null of a unit root cannot be
+rejected for any of the four variables at conventional significance levels,
+consistent with the large literature documenting non-stationarity in oil
+prices, production, inventories and activity indicators. In contrast, all
+transformed series in \texttt{All\_d} exhibit ADF $p$-values well below the
+5\% threshold, supporting the use of the VAR in differences and cycle form.
+
+To complement formal tests, pre-VAR diagnostics include visual inspection of
+time-series plots, autocorrelation functions and ADF $p$-value charts for each
+variable. These confirm that the transformed series fluctuate around a stable
+mean with no obvious residual trends or explosive behaviour.
+
+\section*{A.3 Baseline Static Regression and Diagnostics}
+
+Before moving to a multivariate dynamic specification, a benchmark static
+regression is estimated to assess whether contemporaneous linear relationships
+between the transformed fundamentals and the oil price can explain a
+meaningful share of its variation. The regression is specified as:
+\[
+WTI_{t}^{DL}
+= \beta_0
++ \beta_1 \, \text{Production}_{t}^{DL}
++ \beta_2 \, \text{OECD}_{t}^{DL}
++ \beta_3 \, \text{Inventories}_{t}^{DL}
++ u_t,
+\]
+where the superscript $DL$ denotes $\Delta \log$-transformed variables.
+Although this formulation already removes deterministic trends and stabilises
+variances, the model attains only a very modest adjusted $R^2$ (approximately
+0.11), indicating that contemporaneous fundamentals have limited explanatory
+power for the monthly change in the real WTI price.
+
+Residual diagnostics for this OLS specification reveal:
+
+\begin{itemize}
+  \item strong serial correlation, as indicated by Ljung--Box statistics with
+  $p$-values well below 1\%;
+  \item pronounced heteroskedasticity according to Breusch--Pagan tests
+  ($p \approx 0.0000$);
+  \item clear deviations from normality, with heavy tails relative to the
+  Gaussian benchmark.
+\end{itemize}
+
+Rolling-window estimates of the coefficients further display substantial
+instability across subsamples, especially around major structural episodes
+such as the early-2000s boom and the post-2010 shale expansion. Together,
+these diagnostics suggest that the static OLS framework is inadequate for
+capturing the dynamics of oil prices and motivates the move to a multivariate,
+dynamic VAR/SVAR approach.
+
+\section*{A.4 Distributional Properties of OLS Residuals}
+
+The residuals $u_t$ from the baseline regression provide an initial window on
+the distributional features of unexplained oil-price movements. Empirical
+density plots, histograms and normal Q--Q plots point to marked departures
+from Gaussianity:
+
+\begin{itemize}
+    \item the residual distribution exhibits mild negative skewness, reflecting
+    occasional large downward adjustments in the real WTI price;
+    \item excess kurtosis indicates a leptokurtic shape, with more probability
+    mass in the centre and in the tails than a normal distribution;
+    \item extreme observations are clustered around well-known market events
+    (price collapses and sharp spikes), rather than being isolated outliers.
+\end{itemize}
+
+These features justify the use of bootstrap methods in subsequent stages
+(impulse-response confidence bands, scenario generation) and provide
+preliminary evidence that non-Gaussian shocks may be structurally relevant in
+the oil market. In particular, the heavy tails and asymmetric behaviour of
+$u_t$ are consistent with the presence of large, infrequent structural
+disturbances, which are modelled explicitly in the SVAR framework developed in
+Chapters~\ref{ch:empirical} and~\ref{ch:stress}.
+
+\clearpage

@@ -1,0 +1,126 @@
+\chapter{ITA Airways Fuel Demand Estimation}
+\label{app:ita_fuel}
+
+\section*{C.1 Purpose and Context}
+
+The hedging simulations developed in the main analysis require a realistic estimate of ITA Airways’ annual jet-fuel consumption. Since the airline does not publicly disclose its physical fuel-use figures, the value must be inferred indirectly using operational data, fleet characteristics and standard aviation fuel-burn benchmarks.
+
+This appendix documents the procedure followed to obtain a transparent and conservative estimate suitable for modelling fuel-price exposure. The goal is not to reconstruct exact accounting values, but to generate a consistent operational estimate applicable to the stress-testing and hedging framework.
+
+\section*{C.2 Underlying Operational Data}
+
+The estimation relies on publicly available information for the year 2023:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Scheduled flights:} approximately 124,000 across domestic, intra-European and long-haul routes.
+    \item \textbf{Passengers:} roughly 15 million carried, with an average load factor of about 79\%.
+    \item \textbf{Fleet:} 96 Airbus aircraft, including a growing share of new-generation aircraft (A220, A320neo, A330neo, A350).
+    \item \textbf{Network structure:} operations distributed across:
+    \begin{itemize}[leftmargin=*]
+        \item Domestic and short-haul European routes (\(< 2.5\) hours),
+        \item Medium-haul routes (2.5--5 hours),
+        \item Long-haul intercontinental routes (North America, South America, Middle East, India).
+    \end{itemize}
+\end{itemize}
+
+\section*{C.3 Fuel-Burn Benchmarks and Adjustments}
+
+Average per-flight fuel-burn benchmarks are sourced from industry technical reports and aircraft flight-performance documentation:
+
+\begin{itemize}[leftmargin=*]
+    \item Narrow-body aircraft (short/medium haul): \(2.5\)–\(3.0\) tonnes/flight.
+    \item Wide-body aircraft (long haul): \(40\)–\(55\) tonnes/flight.
+\end{itemize}
+
+To account for real-world operational inefficiencies (congestion, taxi time, step climbs, airspace restrictions, payload variability), a \(\,+10\%\) adjustment is applied.
+
+The following conversion factor is used throughout:
+
+\[
+1~\text{tonne Jet-A1} \approx 7.9~\text{barrels}.
+\]
+
+\section*{C.4 Scenario-Based Estimation Method}
+
+Due to incomplete route-level public data, fuel consumption is modelled using a scenario-based aggregation:
+
+\[
+Q_{\text{jet}} = N_{\text{SR}}\, q_{\text{SR}} + N_{\text{LH}}\, q_{\text{LH}},
+\]
+
+where \(N_{\text{SR}}, N_{\text{LH}}\) denote the number of short-/medium-haul and long-haul flights, and \(q_{\text{SR}}, q_{\text{LH}}\) represent corresponding fuel-burn averages.
+
+Instead of fixing values at a granular level, three internally consistent scenarios are constructed to capture uncertainty in:
+
+\begin{itemize}[leftmargin=*]
+    \item mix of long-haul versus short-/medium-haul flying,
+    \item share of new-generation versus legacy aircraft,
+    \item seasonal variation and utilisation rates,
+    \item operational efficiency and route constraints.
+\end{itemize}
+
+\subsection*{C.4.1 Scenario Results}
+
+\begin{table}[H]
+\centering
+\caption{Estimated 2023 fuel consumption under alternative scenarios.}
+\label{tab:ita_scenarios}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{lccX}
+\toprule
+\textbf{Scenario} & \textbf{Fuel (Mt)} & \textbf{Fuel (million barrels)} & \textbf{Notes} \\
+\midrule
+Minimum & $\approx 0.40$ & $\approx 3.2$ & High efficiency, shorter route structure and high share of new-generation aircraft. \\
+Central & $0.44$--$0.45$ & $3.5$--$3.6$ & Reflects observed 2023 utilisation, fleet composition and route distribution. \\
+Maximum & $0.49$--$0.50$ & $3.9$--$4.0$ & Higher long-haul share, lower efficiency and greater legacy aircraft operation. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\section*{C.5 Cross-Validation Against Comparable Airlines}
+
+To validate plausibility, the estimated range is benchmarked against
+\emph{approximate 2022 jet-fuel use reconstructed from public environmental
+and sustainability disclosures} of airlines with similar fleet size and
+network structure:\footnote{Approximate values obtained by combining
+CO$_2$-emissions and fuel-efficiency indicators reported in the 2022
+sustainability/annual reports of Finnair, TAP Air Portugal and LOT Polish
+Airlines; see, for example, \textcite{Finnair2022,TAP2022,PGLDecarb2030}.}
+
+\begin{itemize}[leftmargin=*]
+    \item Finnair (2022): $\sim 0.79$ Mt,
+    \item TAP Air Portugal (2022): $\sim 0.58$ Mt,
+    \item LOT Polish Airlines (2022): $\sim 0.45$ Mt.
+\end{itemize}
+
+Given ITA’s long-haul expansion in 2023 and the partial transition toward
+newer aircraft, the estimated $0.44$–$0.50$ Mt range is consistent with
+these comparators.
+
+
+\section*{C.6 Financial Consistency Check}
+
+To ensure internal consistency with typical airline economics, fuel cost implications are evaluated using a reference wholesale price range:
+
+\[
+\$700 \leq P_{\text{Jet Fuel}} \leq \$1,050 \text{ per tonne}.
+\]
+
+This implies:
+
+\[
+280\text{ M€} \leq \text{Annual Fuel Cost} \leq 525\text{ M€},
+\]
+
+which aligns with the 20–35\% cost share commonly observed among European network carriers.
+
+\section*{C.7 Final Value Adopted in the Model}
+
+For the simulations, a single representative value is required. Based on scenario inference and validation tests, the following value is adopted:
+
+\[
+Q_{\text{jet, used}} = 3.5 \times 10^{6}~\text{barrels/year}.
+\]
+
+This quantity provides a conservative but realistic approximation of ITA Airways’ annual exposure to jet-fuel price risk.
